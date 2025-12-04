@@ -1,189 +1,283 @@
-# Project Layout Section Variants
+# Project Page Layouts
 
-## Overview
-
-This document defines the layout section types available for project pages. The naming convention is designed to be **semantic and self-explanatory**, especially for Sanity CMS integration where content editors need to understand their options.
+A simple guide to all the layout blocks you can use when building project pages.
 
 ---
 
-## 1. Layout Properties
+## Quick Reference
 
-All sections (except Carousel, T-Grid Hero, and FW-BG-53) share these defaults:
-
-- **padding:** `0 --gutter`
-- **margin:** `auto 0`
-- **gap:** `--gutter`
-
----
-
-## 2. Section Types
-
-### 2.1. Text Section (T-Grid)
-
-**Schema Type:** `t-grid-hero` | `t-grid-left` | `t-grid-right`
-
-6-column text grid for headlines and body copy.
-
-| Variant | Columns | Use Case |
-|---------|---------|----------|
-| `t-grid-hero` | 1–5 | Large intro text, 3.5rem |
-| `t-grid-left` | 2–4 | Body copy, left-aligned |
-| `t-grid-right` | 4–6 | Body copy, right-aligned |
-
-**Props:**
-- `text` (string, required): Text content, supports `\n` for line breaks
-- `eyebrow` (string, optional): Small label above main text
-
-**Animation:** Line-by-line slide-up reveal with staggered delays.
+| What It's Called | What It Does | Best For |
+|------------------|--------------|----------|
+| **Big Quote** | Large statement text | Opening lines, key messages |
+| **Body Text (Left)** | Paragraph text on the left | Descriptions, stories |
+| **Body Text (Right)** | Paragraph text on the right | Alternate positioning |
+| **Full Photo** | Edge-to-edge image | Hero shots, big moments |
+| **Photo Slider** | Swipeable photo gallery | Multiple related images |
+| **Feature + Detail** | One big photo + one small photo | Showing scale & detail |
+| **Staircase** | Diagonal arrangement | Visual rhythm, flow |
+| **Four Square** | 2×2 grid of photos | Collections, series |
+| **Side by Side** | Heading + paragraph text | Intro sections |
+| **Photo Grid** | Flexible image grid | Multiple photos |
 
 ---
 
-### 2.2. Full-Width Image (FW-STD-53)
+## Layout Blocks
 
-**Schema Type:** `fw-std-53`
+### 1. Big Quote
 
-Full-width image with 5:3 aspect ratio.
-
-**Props:**
-- `media[0]`: Single image
-
-**Animation:** Curtain reveal (top to bottom).
-
----
-
-### 2.3. Carousel
-
-**Schema Type:** `carousel`
-
-Horizontal scrolling gallery with drag interaction.
-
-**Props:**
-- `media[]`: Array of images (recommended: 6)
-- `initialIndex` (number, optional): Starting slide (0-indexed, default: 0)
-
-**Features:**
-- Center image fully visible
-- Adjacent images peek at edges
-- Custom drag cursor
-- Scroll-snap behavior
-
----
-
-### 2.4. Asymmetric Grid
-
-**Schema Type:** `asymmetric-grid`
-
-**REPLACES:** The confusing `TriGrid-2x2*` and `DGU-2x2*` variants.
-
-A flexible 2-column layout with one large image (spanning 2 rows) and one small image. Uses **semantic props** that are easy for content editors to understand in Sanity.
-
-**Props:**
-- `largePosition`: `'left'` or `'right'` — which column the large image occupies
-- `smallPosition`: `'top'` or `'bottom'` — vertical position of small image
-- `media[0]`: Large image
-- `media[1]`: Small image
-- `textContent` (optional): Text for the empty cell
-
-**Visual Examples:**
+A large, attention-grabbing text block. Perfect for opening statements or key quotes.
 
 ```
-largePosition='left', smallPosition='top':
-╔═══════════╦═══════╗
-║           ║ small ║
-║   LARGE   ╠═══════╣
-║           ║ empty ║
-╚═══════════╩═══════╝
-
-largePosition='left', smallPosition='bottom':
-╔═══════════╦═══════╗
-║           ║ empty ║
-║   LARGE   ╠═══════╣
-║           ║ small ║
-╚═══════════╩═══════╝
-
-largePosition='right', smallPosition='top':
-╔═══════╦═══════════╗
-║ small ║           ║
-╠═══════╣   LARGE   ║
-║ empty ║           ║
-╚═══════╩═══════════╝
-
-largePosition='right', smallPosition='bottom':
-╔═══════╦═══════════╗
-║ empty ║           ║
-╠═══════╣   LARGE   ║
-║ small ║           ║
-╚═══════╩═══════════╝
+Schema type: t-grid-hero
 ```
 
-**Animation:** Curtain reveal (top to bottom), staggered for small image.
+**You provide:**
+- **Text** — The main message (press Enter for new lines)
+- **Label** *(optional)* — Small text above the quote (like "About" or "01")
+
+**Example:**
+```
+╔════════════════════════════════════════╗
+║  ABOUT                                 ║
+║                                        ║
+║  We create spaces that               ║
+║  inspire wonder and                  ║
+║  spark imagination.                  ║
+╚════════════════════════════════════════╝
+```
 
 ---
 
-### 2.5. Diagonal
+### 2. Body Text (Left / Right)
 
-**Schema Type:** `diagonal`
+Regular paragraph text positioned on the left or right side of the page.
 
-Staggered layout creating a visual diagonal.
+```
+Schema type: t-grid-left  or  t-grid-right
+```
 
-**Props:**
-- `media[0]`: Large image (top-left)
-- `media[1]`: Small image (bottom-right)
+**You provide:**
+- **Text** — Your paragraph content
+- **Label** *(optional)* — Small heading above
 
+**Example (left-aligned):**
+```
+╔════════════════════════════════════════╗
+║        Our approach combines           ║
+║        traditional craft with          ║
+║        modern techniques...            ║
+╚════════════════════════════════════════╝
+```
+
+---
+
+### 3. Full Photo
+
+A full-width image that stretches edge-to-edge.
+
+```
+Schema type: fw-std-53
+```
+
+**You provide:**
+- **Image** — Upload one photo
+- **Caption** *(optional)* — Text below the image
+
+**Example:**
+```
+╔════════════════════════════════════════╗
+║                                        ║
+║     ████████████████████████████       ║
+║     ██                        ██       ║
+║     ██   [  YOUR PHOTO  ]     ██       ║
+║     ██                        ██       ║
+║     ████████████████████████████       ║
+║                                        ║
+╚════════════════════════════════════════╝
+```
+
+---
+
+### 4. Photo Slider
+
+A horizontal gallery you can drag/swipe through. Great for showing a series of related images.
+
+```
+Schema type: carousel
+```
+
+**You provide:**
+- **Images** — Upload 4-8 photos (6 is ideal)
+- **Start at** *(optional)* — Which photo shows first (1, 2, 3...)
+
+**Example:**
+```
+╔════════════════════════════════════════╗
+║                                        ║
+║   ▐▌  ┌─────────┐  ▐▌                 ║
+║   ▐▌  │         │  ▐▌                 ║
+║   ▐▌  │ CURRENT │  ▐▌                 ║
+║   ▐▌  │  PHOTO  │  ▐▌                 ║
+║   ▐▌  │         │  ▐▌                 ║
+║   ▐▌  └─────────┘  ▐▌                 ║
+║                                        ║
+║         ← drag to scroll →             ║
+╚════════════════════════════════════════╝
+```
+
+---
+
+### 5. Feature + Detail
+
+One large "feature" photo paired with a smaller "detail" photo. Perfect for showing context and close-ups together.
+
+```
+Schema type: asymmetric-grid
+```
+
+**You provide:**
+- **Large image** — The main/feature photo
+- **Small image** — The detail/secondary photo
+- **Large image side** — `left` or `right`
+- **Small image position** — `top` or `bottom`
+- **Text** *(optional)* — Goes in the empty space
+
+**Layout options:**
+
+```
+Large LEFT, small TOP:        Large LEFT, small BOTTOM:
+╔═══════════╦═══════╗         ╔═══════════╦═══════╗
+║           ║ small ║         ║           ║       ║
+║   LARGE   ╠═══════╣         ║   LARGE   ╠═══════╣
+║           ║       ║         ║           ║ small ║
+╚═══════════╩═══════╝         ╚═══════════╩═══════╝
+
+Large RIGHT, small TOP:       Large RIGHT, small BOTTOM:
+╔═══════╦═══════════╗         ╔═══════╦═══════════╗
+║ small ║           ║         ║       ║           ║
+╠═══════╣   LARGE   ║         ╠═══════╣   LARGE   ║
+║       ║           ║         ║ small ║           ║
+╚═══════╩═══════════╝         ╚═══════╩═══════════╝
+```
+
+---
+
+### 6. Staircase
+
+Two photos arranged diagonally — big one top-left, small one bottom-right. Creates a nice visual flow.
+
+```
+Schema type: diagonal
+```
+
+**You provide:**
+- **Image 1** — Large photo (top-left)
+- **Image 2** — Small photo (bottom-right)
+
+**Example:**
 ```
 ╔════════════╦════════════╗
-║ ██████████ ║            ║  ← Large image (1:0.8 aspect)
+║ ██████████ ║            ║
+║ ██ LARGE ██║            ║
+║ ██████████ ║            ║
 ╠════════════╬════════════╣
-║            ║    ██      ║  ← Small image (1:0.8 aspect)
+║            ║   ████     ║
+║            ║   small    ║
 ╚════════════╩════════════╝
 ```
 
-**Animation:** Curtain reveal, staggered timing.
-
 ---
 
-## 3. Animations
+### 7. Four Square
 
-All image sections use a **curtain reveal** animation that works with any image source (including Unsplash):
-
-- **Mechanism:** CSS `scaleY(1) → scaleY(0)` on a solid-color overlay
-- **Direction:** Top to bottom (reveals from top)
-- **Duration:** 1s with cubic-bezier easing
-- **Image zoom:** Subtle 1.05 → 1.0 scale during reveal
-
-All text uses **fade-in + slide-up** animation:
-- **Initial state:** `opacity: 0; transform: translateY(20px)`
-- **Final state:** `opacity: 1; transform: translateY(0)`
-- **Duration:** 0.6–0.8s depending on context
-
----
-
-## 4. Sanity Integration Notes
-
-With the `asymmetric-grid` type, Sanity can expose a clean dropdown for editors:
+A clean 2×2 grid of four equal photos. Great for showing a collection or series.
 
 ```
-Layout Options:
-├── "Large image left, small top"
-├── "Large image left, small bottom"  
-├── "Large image right, small top"
-└── "Large image right, small bottom"
+Schema type: quad-grid
 ```
 
-Each option maps to `largePosition` + `smallPosition` props. Content editors can:
-1. Define any number of sections
-2. Choose section type from dropdown
-3. Upload images
-4. See real-time preview
+**You provide:**
+- **Images** — Exactly 4 photos
+- **Spacing** — `none`, `small`, or `medium`
+- **Shape** — `1/1` (square), `4/3` (landscape), `3/4` (portrait)
+
+**Example:**
+```
+╔═══════════╦═══════════╗
+║   Photo   ║   Photo   ║
+║     A     ║     B     ║
+╠═══════════╬═══════════╣
+║   Photo   ║   Photo   ║
+║     C     ║     D     ║
+╚═══════════╩═══════════╝
+```
 
 ---
 
-## 5. Migration from Legacy Types
+### 8. Side by Side
 
-| Old Type | New Type | Props |
-|----------|----------|-------|
-| `trigrid-2x2a` | `asymmetric-grid` | `largePosition='left', smallPosition='top'` |
-| `trigrid-2x2b` | `asymmetric-grid` | `largePosition='left', smallPosition='bottom'` + textContent |
-| `dgu-2x2a` | `asymmetric-grid` | `largePosition='right', smallPosition='bottom'` |
-| `dgu-2x2b` | `asymmetric-grid` | `largePosition='right', smallPosition='bottom'` + textContent |
-| `dgu-2x2c` | `asymmetric-grid` | `largePosition='right', smallPosition='top'` |
+A heading on one side with paragraph text on the other. Good for intro sections.
+
+```
+Schema type: two-column
+```
+
+**You provide:**
+- **Heading** — The title text
+- **Body** — The paragraph text
+- **Label** *(optional)* — Small text above heading
+- **Layout** — `heading-left` or `heading-right`
+
+**Example:**
+```
+╔════════════════╦═══════════════════════╗
+║  The Process   ║  We start by under-   ║
+║                ║  standing your vision ║
+║                ║  and goals. Then we   ║
+║                ║  develop concepts...  ║
+╚════════════════╩═══════════════════════╝
+```
+
+---
+
+### 9. Photo Grid
+
+A flexible grid of photos. You control how many columns.
+
+```
+Schema type: image-grid
+```
+
+**You provide:**
+- **Images** — Any number of photos
+- **Columns** — 2, 3, or 4
+- **Spacing** — `small`, `medium`, or `large`
+
+---
+
+## Tips for Building Great Pages
+
+1. **Start with a Big Quote** — Hook viewers with a strong opening statement
+2. **Alternate layouts** — Mix large images with text sections for rhythm
+3. **Use Photo Slider for series** — When you have 4+ related images
+4. **Feature + Detail for impact** — Show the big picture AND the close-up
+5. **End with a statement** — Use Body Text for a closing thought
+
+---
+
+## Technical Reference
+
+For developers — here's how schema types map to components:
+
+| Schema Type | Component File | Notes |
+|-------------|----------------|-------|
+| `t-grid-hero` | `TGridSection.svelte` | variant="hero" |
+| `t-grid-left` | `TGridSection.svelte` | variant="left" |
+| `t-grid-right` | `TGridSection.svelte` | variant="right" |
+| `fw-std-53` | `FullBleedImage.svelte` | 5:3 aspect ratio |
+| `carousel` | `Carousel.svelte` | |
+| `asymmetric-grid` | `AsymmetricGrid.svelte` | |
+| `diagonal` | `Diagonal.svelte` | |
+| `quad-grid` | `QuadGrid.svelte` | |
+| `two-column` | `TwoColumnText.svelte` | |
+| `image-grid` | `ImageGrid.svelte` | |

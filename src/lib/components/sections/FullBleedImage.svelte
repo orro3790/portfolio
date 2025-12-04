@@ -22,13 +22,6 @@
 
 	let visible = $state(false);
 
-	// Auto-trigger after mount as fallback for initial load
-	$effect(() => {
-		const timer = setTimeout(() => {
-			if (!visible) visible = true;
-		}, 300);
-		return () => clearTimeout(timer);
-	});
 </script>
 
 <section
@@ -51,7 +44,7 @@
 <style>
 	.full-bleed {
 		width: 100%;
-		padding: var(--space-8) 0;
+		padding: var(--space-8) var(--gutter);
 	}
 
 	.full-bleed__wrapper {

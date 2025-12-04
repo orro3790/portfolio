@@ -10,4 +10,11 @@ declare global {
 	}
 }
 
+// Augment svelte/elements for custom action events
+declare module 'svelte/elements' {
+	interface HTMLAttributes<T> {
+		oninview?: (event: CustomEvent<{ inView: boolean; entry: IntersectionObserverEntry }>) => void;
+	}
+}
+
 export {};

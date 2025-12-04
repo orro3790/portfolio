@@ -34,13 +34,6 @@
 		}
 	}
 
-	// Auto-trigger after mount as fallback
-	$effect(() => {
-		const timer = setTimeout(() => {
-			if (!visible) visible = true;
-		}, 500);
-		return () => clearTimeout(timer);
-	});
 </script>
 
 <section
@@ -160,5 +153,6 @@
 		transform: translateY(0);
 	}
 </style>
+
 
 

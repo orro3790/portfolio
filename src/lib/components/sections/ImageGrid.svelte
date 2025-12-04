@@ -45,7 +45,7 @@
 
 <style>
 	.image-grid {
-		padding: var(--space-8) var(--space-6);
+		padding: var(--space-8) var(--gutter);
 	}
 
 	.image-grid__container {
@@ -83,7 +83,7 @@
 
 	.image-grid__item {
 		overflow: hidden;
-		border-radius: var(--radius-sm);
+		border-radius: 4px;
 
 		/* Staggered fade + scale animation */
 		opacity: 0;
@@ -110,4 +110,3 @@
 		transform: scale(1.03);
 	}
 </style>
-

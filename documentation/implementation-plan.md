@@ -27,9 +27,8 @@ Create polished, reusable section components with scroll-triggered animations th
 | `DoubleImage` | Side-by-side images with configurable gap/aspect | Staggered fade-in | ✅ |
 | `TGridSection` | 6-column text grid (hero/left/right variants) | Line-by-line reveal | ⬜ |
 | `Carousel` | Horizontal carousel with peek effect | Fade-in, smooth scroll | ⬜ |
-| `TriGrid` | Asymmetric 2-col grid (1fr 0.6fr) | Staggered cell reveal | ⬜ |
+| `Asymmetric Grid` | Asymmetric 2-col grid with large/small images | Staggered cell reveal | ⬜ |
 | `Diagonal` | Diagonal image arrangement | Staggered reveal | ⬜ |
-| `DualGridUneven` | Uneven 2-col grid (0.31fr 0.69fr) | Staggered reveal | ⬜ |
 
 ### Animation Patterns
 
@@ -56,14 +55,14 @@ Create polished, reusable section components with scroll-triggered animations th
 | 1 | **T-grid-hero** | `t-grid-hero` | Hero text spanning columns 1–5 of 6-column grid, 3.5rem font |
 | 2 | **FW-STD-53** | `fw-std-53` | Full-width image, 5:3 aspect ratio |
 | 3 | **Carousel** | `carousel-6` | 6-image carousel with center focus, [a]/[c] peek effect |
-| 4 | **TriGrid-2x2A** | `trigrid-2x2a` | 1fr 0.6fr columns; area 'a' (1:1 left), 'b' (top-right), 'c' empty |
+| 4 | **Asymmetric Grid** | `asymmetric-grid` | Large left, small top |
 | 5 | **T-grid-right** | `t-grid-right` | Text columns 4–6 of 6-column grid |
 | 6 | **Diagonal** | `diagonal` | 2-row, 2-col diagonal layout; large img top-left, small bottom-right |
 | 7 | **T-grid-left** | `t-grid-left` | Text columns 2–4 of 6-column grid |
 | 8 | **FW-STD-53** | `fw-std-53` | Full-width image, 5:3 aspect ratio |
-| 9 | **DGU-2x2C** | `dgu-2x2c` | Dual grid uneven; 'a' has 1:1.3 image, 'b' empty, 'c' spans rows |
+| 9 | **Asymmetric Grid** | `asymmetric-grid` | Large right, small top |
 | 10 | **T-grid-left** | `t-grid-left` | Text columns 2–4 of 6-column grid |
-| 11 | **DGU-2x2A** | `dgu-2x2a` | Dual grid uneven; 'a' empty, 'b' has 1:1.3 image, 'c' spans rows |
+| 11 | **Asymmetric Grid** | `asymmetric-grid` | Large right, small bottom |
 
 ### New Components Required
 
@@ -71,9 +70,8 @@ Create polished, reusable section components with scroll-triggered animations th
 |-----------|------|----------|-------|
 | `TGridSection` | `sections/TGridSection.svelte` | `hero`, `left`, `right` | `text`, `eyebrow?`, `variant` |
 | `Carousel` | `sections/Carousel.svelte` | `peek-3`, `peek-6` | `images[]`, `peekCount?` |
-| `TriGrid` | `sections/TriGrid.svelte` | `2x2A`, `2x2B` | `imageA`, `imageB`, `contentC?` |
+| `AsymmetricGrid` | `sections/AsymmetricGrid.svelte` | — | `largePosition`, `smallPosition`, `imageLarge`, `imageSmall` |
 | `Diagonal` | `sections/Diagonal.svelte` | — | `imageLarge`, `imageSmall` |
-| `DualGridUneven` | `sections/DualGridUneven.svelte` | `2x2A`, `2x2B`, `2x2C` | `contentA?`, `imageB?`, `imageC` |
 
 ### Grid Specifications
 
@@ -95,14 +93,16 @@ padding: 0 var(--gutter);
 .t-grid-right .content { grid-column: 4 / 7; }
 ```
 
-#### TriGrid-2x2
+#### Asymmetric Grid
 ```css
 display: grid;
-grid-template-columns: 1fr 0.6fr;
-grid-template-areas:
-  "a b"
-  "a .";  /* 2x2A: c empty */
-/* 'a': 1:1 aspect, 'b': 1:0.6 aspect */
+/* 2-column grid with varying widths based on large position */
+grid-template-columns: var(--grid-columns); /* e.g. 1.1fr 0.9fr */
+grid-template-areas: var(--grid-areas);
+/* Areas example:
+   "large small"
+   "large empty"
+*/
 ```
 
 #### Diagonal Layout
@@ -115,18 +115,6 @@ grid-template-rows: auto auto;
 /* Both images 1:0.8 aspect; large ~800px, small ~340px */
 ```
 
-#### DGU-2x2 (Dual Grid Uneven)
-```css
-display: grid;
-grid-template-columns: 0.31fr 0.69fr;
-grid-template-areas:
-  "a c"
-  "b c";
-/* 'c': 1:0.8 aspect, spans rows */
-/* 'b': 1:1.3 aspect */
-/* 'a': empty (2x2A), text (2x2B), or 1:1.3 image (2x2C) */
-```
-
 ### Implementation Tasks
 
 #### Phase 1A: Schema Updates
@@ -134,16 +122,14 @@ grid-template-areas:
   - `t-grid-hero`, `t-grid-left`, `t-grid-right`
   - `fw-std-53`
   - `carousel`
-  - `trigrid-2x2a`, `trigrid-2x2b`
+  - `asymmetric-grid`
   - `diagonal`
-  - `dgu-2x2a`, `dgu-2x2b`, `dgu-2x2c`
 
 #### Phase 1B: Component Development
 - [ ] **TGridSection** — 6-column text grid with hero/left/right variants
 - [ ] **Carousel** — Horizontal scroll with peek effect, 6 images
-- [ ] **TriGrid** — Asymmetric 2-column layout (1fr 0.6fr)
+- [ ] **AsymmetricGrid** — Unified asymmetric 2-column layout
 - [ ] **Diagonal** — Staggered diagonal image arrangement
-- [ ] **DualGridUneven** — 0.31fr/0.69fr split with 3 variants
 
 #### Phase 1C: Page Assembly
 - [ ] Update `src/lib/data/projects.ts` Layers entry with new section structure
@@ -157,9 +143,8 @@ grid-template-areas:
 | T-grid-* | Line-by-line text reveal (existing pattern) |
 | FW-STD-53 | Curtain reveal with scale (existing FullBleedImage) |
 | Carousel | Fade-in items, smooth horizontal scroll |
-| TriGrid | Staggered reveal: a → b (100ms delay) |
+| Asymmetric Grid | Staggered reveal: large → small/text |
 | Diagonal | Large image first, small 200ms later |
-| DGU-2x2 | Image c reveals first, then a/b content |
 
 ---
 
@@ -187,9 +172,8 @@ Replace placeholder content with CMS-managed content while preserving all animat
 | `TwoColumnText` | `heading`, `body` (Portable Text) |
 | `TGridSection` | `text`, `eyebrow?`, `variant` (hero/left/right) |
 | `Carousel` | `images[]`, `peekCount?` |
-| `TriGrid` | `imageA`, `imageB`, `contentC?`, `variant` (2x2A/2x2B) |
+| `AsymmetricGrid` | `largePosition`, `smallPosition`, `imageLarge`, `imageSmall`, `textContent?` |
 | `Diagonal` | `imageLarge`, `imageSmall` |
-| `DualGridUneven` | `contentA?`, `imageB?`, `imageC`, `variant` (2x2A/2x2B/2x2C) |
 
 ---
 

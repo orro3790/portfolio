@@ -24,12 +24,6 @@ export type Media = z.infer<typeof mediaSchema>;
  */
 export const sectionSchema = z.object({
 	type: z.enum([
-		// Legacy types (keep for backwards compatibility)
-		'hero',
-		'fullwidth',
-		'split',
-		'grid',
-		'text',
 		// Animated section templates
 		'text-reveal',
 		'full-bleed-image',
@@ -44,7 +38,7 @@ export const sectionSchema = z.object({
 		'fw-std-53',
 		// Carousel
 		'carousel',
-		// Asymmetric grid (replaces TriGrid + DGU)
+		// Asymmetric grid
 		'asymmetric-grid',
 		// Diagonal layout
 		'diagonal'

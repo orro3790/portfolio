@@ -2,7 +2,7 @@
 	/**
 	 * AsymmetricGrid Section — Unified asymmetric 2-column layout.
 	 *
-	 * Replaces the confusing TriGrid + DGU components with semantic props:
+	 * Semantic props:
 	 * - largePosition: Where the spanning image sits ('left' or 'right')
 	 * - smallPosition: Where the smaller image sits ('top' or 'bottom')
 	 *
@@ -65,14 +65,6 @@
 
 	// Column sizing: larger column gets more space
 	const gridColumns = $derived(largePosition === 'left' ? '1.1fr 0.9fr' : '0.9fr 1.1fr');
-
-	// Auto-trigger after mount as fallback
-	$effect(() => {
-		const timer = setTimeout(() => {
-			if (!visible) visible = true;
-		}, 300);
-		return () => clearTimeout(timer);
-	});
 </script>
 
 <section
@@ -120,17 +112,16 @@
 
 <style>
 	.asym-grid {
-		padding: var(--space-16) var(--gutter);
+		padding: var(--space-8) var(--gutter);
 	}
 
 	.asym-grid__layout {
 		display: grid;
 		grid-template-columns: var(--grid-columns);
-		grid-template-rows: 1fr 1fr;
+		grid-template-rows: auto auto;
 		grid-template-areas: var(--grid-areas);
-		gap: var(--gutter);
-		max-width: var(--max-width);
-		margin: 0 auto;
+		gap: var(--space-4);
+		/* No max-width - grid fills available width */
 	}
 
 	/* Cell positioning via grid areas */
@@ -152,25 +143,24 @@
 
 	/* 
 	 * Small image alignment based on position:
-	 * - If small is at TOP, align content to END (bottom of cell)
-	 * - If small is at BOTTOM, align content to START (top of cell)
-	 * This ensures the image "hugs" the adjacent large image
+	 * - If small is at TOP, align content to START (top of cell)
+	 * - If small is at BOTTOM, align content to END (bottom of cell)
 	 */
 	.asym-grid.small-top .asym-grid__cell--small {
-		justify-content: flex-end;
+		justify-content: flex-start;
 	}
 
 	.asym-grid.small-bottom .asym-grid__cell--small {
-		justify-content: flex-start;
+		justify-content: flex-end;
 	}
 
 	/* Empty cell alignment (opposite of small) */
 	.asym-grid.small-top .asym-grid__cell--empty {
-		justify-content: flex-start;
+		justify-content: flex-end;
 	}
 
 	.asym-grid.small-bottom .asym-grid__cell--empty {
-		justify-content: flex-end;
+		justify-content: flex-start;
 	}
 
 	/* Image wrappers */
@@ -179,20 +169,17 @@
 		overflow: hidden;
 		background-color: var(--color-bg-elevated);
 		border-radius: 4px;
+		width: 100%;
 	}
 
-	/* Large image: fills the spanning cell, natural aspect */
+	/* Large image: landscape ratio matching Metalab reference (~3:2) */
 	.asym-grid__image-wrapper--large {
-		width: 100%;
-		height: 100%;
-		min-height: 450px;
+		aspect-ratio: 3 / 2;
 	}
 
-	/* Small image: constrained but substantial (~65% of large) */
+	/* Small image: slightly wider landscape (~16:9) */
 	.asym-grid__image-wrapper--small {
-		width: 100%;
-		aspect-ratio: 1 / 0.85;
-		min-height: 280px;
+		aspect-ratio: 16 / 9;
 	}
 
 	.asym-grid__image-wrapper img {
@@ -280,17 +267,6 @@
 				'large'
 				'small'
 				'empty';
-		}
-
-		.asym-grid__image-wrapper--large {
-			min-height: 350px;
-			height: auto;
-			aspect-ratio: 1 / 1;
-		}
-
-		.asym-grid__image-wrapper--small {
-			min-height: 220px;
-			aspect-ratio: 1 / 0.7;
 		}
 
 		/* Reset alignment on mobile */

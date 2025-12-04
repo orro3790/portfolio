@@ -1,16 +1,18 @@
 <script lang="ts">
 	/**
-	 * Diagonal Section — Staggered diagonal image arrangement.
-	 * Based on project-layouts.md Diagonal specification:
-	 * - 2 rows, 2 columns
-	 * - Top row: large image (left), empty (right)
-	 * - Bottom row: empty (left), small image (right)
-	 * - Both images 1:0.8 aspect ratio
-	 * - Large image ~800px tall, small ~340px tall
+	 * Diagonal Section — Staggered diagonal image arrangement using flex rows.
 	 *
-	 * Features:
-	 * - Curtain reveal animation (top to bottom)
-	 * - Caption fade-in + slide-up animation
+	 * Layout (like Metalab's TextAnd2Images):
+	 * ┌────────────────────────────────────────┐
+	 * │ ┌─────────────────────┐                │  ← Row 1: Large image, flex-start
+	 * │ │      LARGE          │                │
+	 * │ └─────────────────────┘                │
+	 * │                ┌─────────────┐         │  ← Row 2: Small image, flex-end
+	 * │                │    SMALL    │         │     (overlaps via negative margin)
+	 * │                └─────────────┘         │
+	 * └────────────────────────────────────────┘
+	 *
+	 * Flex rows give more control over stagger positioning than CSS grid.
 	 */
 	import { inview } from '$lib/actions/inView';
 
@@ -23,21 +25,15 @@
 	interface Props {
 		/** Large image (top-left) */
 		imageLarge: ImageData;
-		/** Small image (bottom-right) */
+		/** Small image (bottom-right, staggered) */
 		imageSmall: ImageData;
+		/** How much the small image overlaps/staggers up (default: 15%) */
+		staggerAmount?: string;
 	}
 
-	let { imageLarge, imageSmall }: Props = $props();
+	let { imageLarge, imageSmall, staggerAmount = '15%' }: Props = $props();
 
 	let visible = $state(false);
-
-	// Auto-trigger after mount as fallback
-	$effect(() => {
-		const timer = setTimeout(() => {
-			if (!visible) visible = true;
-		}, 300);
-		return () => clearTimeout(timer);
-	});
 </script>
 
 <section
@@ -46,10 +42,10 @@
 	use:inview={{ threshold: 0.15 }}
 	oninview={() => (visible = true)}
 >
-	<div class="diagonal__grid">
-		<!-- Row 1: Large image left, empty right -->
-		<div class="diagonal__cell diagonal__cell--large">
-			<div class="diagonal__image-wrapper diagonal__image-wrapper--large">
+	<!-- Row 1: Large image aligned left -->
+	<div class="diagonal__row diagonal__row--large">
+		<div class="diagonal__media-container diagonal__media-container--large">
+			<div class="diagonal__image-wrapper">
 				<div class="diagonal__curtain"></div>
 				<img src={imageLarge.src} alt={imageLarge.alt} loading="lazy" />
 			</div>
@@ -57,13 +53,13 @@
 				<p class="diagonal__caption">{imageLarge.caption}</p>
 			{/if}
 		</div>
-		<div class="diagonal__cell diagonal__cell--empty-top"></div>
+	</div>
 
-		<!-- Row 2: Empty left, small image right -->
-		<div class="diagonal__cell diagonal__cell--empty-bottom"></div>
-		<div class="diagonal__cell diagonal__cell--small">
-			<div class="diagonal__image-wrapper diagonal__image-wrapper--small">
-				<div class="diagonal__curtain"></div>
+	<!-- Row 2: Small image aligned right with stagger overlap -->
+	<div class="diagonal__row diagonal__row--small" style="--stagger: -{staggerAmount}">
+		<div class="diagonal__media-container diagonal__media-container--small">
+			<div class="diagonal__image-wrapper">
+				<div class="diagonal__curtain diagonal__curtain--delayed"></div>
 				<img src={imageSmall.src} alt={imageSmall.alt} loading="lazy" />
 			</div>
 			{#if imageSmall.caption}
@@ -75,67 +71,52 @@
 
 <style>
 	.diagonal {
-		padding: var(--space-16) var(--gutter);
-	}
-
-	.diagonal__grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: auto auto;
+		padding: var(--space-8) var(--gutter);
+		display: flex;
+		flex-direction: column;
 		gap: var(--gutter);
-		max-width: var(--max-width);
-		margin: 0 auto;
 	}
 
-	/* Cell positioning */
-	.diagonal__cell--large {
-		grid-column: 1;
-		grid-row: 1;
+	/* Flex rows for positioning control */
+	.diagonal__row {
+		display: flex;
+		width: 100%;
 	}
 
-	.diagonal__cell--empty-top {
-		grid-column: 2;
-		grid-row: 1;
+	.diagonal__row--large {
+		justify-content: flex-start;
 	}
 
-	.diagonal__cell--empty-bottom {
-		grid-column: 1;
-		grid-row: 2;
+	.diagonal__row--small {
+		justify-content: flex-end;
 	}
 
-	.diagonal__cell--small {
-		grid-column: 2;
-		grid-row: 2;
-		/* Align to end so it sits at bottom of its cell */
-		align-self: end;
+	/* Media containers control image widths */
+	.diagonal__media-container {
+		position: relative;
 	}
 
-	/* Image wrappers */
+	.diagonal__media-container--large {
+		width: 65%;
+	}
+
+	.diagonal__media-container--small {
+		width: 45%;
+	}
+
+	/* Image wrapper with aspect ratio */
 	.diagonal__image-wrapper {
 		position: relative;
-		aspect-ratio: 1 / 0.8; /* 1:0.8 (width:height) */
 		overflow: hidden;
 		background-color: var(--color-bg-elevated);
 		border-radius: 4px;
-	}
-
-	/* Large image sizing: ~800px equivalent */
-	.diagonal__image-wrapper--large {
-		max-height: 800px;
-	}
-
-	/* Small image sizing: ~340px equivalent (roughly 42.5% of large) */
-	.diagonal__image-wrapper--small {
-		max-height: 340px;
-		max-width: 70%; /* Keep it smaller relative to column */
-		margin-left: auto; /* Push to right within column */
+		aspect-ratio: 3 / 2;
 	}
 
 	.diagonal__image-wrapper img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		/* Subtle zoom on reveal */
 		transform: scale(1.05);
 		transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
@@ -144,10 +125,7 @@
 		transform: scale(1);
 	}
 
-	/*
-	 * Curtain reveal animation (top to bottom)
-	 * Works with any image source including Unsplash
-	 */
+	/* Curtain reveal animation */
 	.diagonal__curtain {
 		position: absolute;
 		inset: 0;
@@ -158,23 +136,21 @@
 		transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
 	}
 
+	.diagonal__curtain--delayed {
+		transition-delay: 200ms;
+	}
+
 	.diagonal.visible .diagonal__curtain {
 		transform: scaleY(0);
 		transform-origin: bottom;
 	}
 
-	/* Stagger the small image reveal */
-	.diagonal__cell--small .diagonal__curtain {
-		transition-delay: 200ms;
-	}
-
-	/* Caption styling with fade-in + slide-up animation */
+	/* Caption styling */
 	.diagonal__caption {
 		margin-top: var(--space-3);
 		font-family: var(--font-body);
 		font-size: var(--text-sm);
 		color: var(--color-text-muted);
-		/* Animation initial state */
 		opacity: 0;
 		transform: translateY(12px);
 		transition:
@@ -189,29 +165,16 @@
 
 	/* Responsive: stack on mobile */
 	@media (max-width: 768px) {
-		.diagonal__grid {
-			grid-template-columns: 1fr;
-			grid-template-rows: auto auto;
+		.diagonal__row--small {
+			margin-top: var(--space-4);
 		}
 
-		.diagonal__cell--large {
-			grid-column: 1;
-			grid-row: 1;
+		.diagonal__media-container--large {
+			width: 100%;
 		}
 
-		.diagonal__cell--small {
-			grid-column: 1;
-			grid-row: 2;
-			justify-self: end;
-		}
-
-		.diagonal__cell--empty-top,
-		.diagonal__cell--empty-bottom {
-			display: none;
-		}
-
-		.diagonal__image-wrapper--small {
-			max-width: 60%;
+		.diagonal__media-container--small {
+			width: 70%;
 		}
 	}
 </style>

@@ -142,13 +142,6 @@
 		handleScroll();
 	}
 
-	// Auto-trigger visibility after mount
-	$effect(() => {
-		const timer = setTimeout(() => {
-			if (!visible) visible = true;
-		}, 300);
-		return () => clearTimeout(timer);
-	});
 
 	// Center initial image on mount (start at photo 3 = index 2)
 	$effect(() => {
@@ -218,7 +211,7 @@
 
 <style>
 	.carousel {
-		padding: var(--space-16) 0;
+		padding: var(--space-12) 0;
 		overflow: hidden;
 		width: 100%;
 		position: relative;

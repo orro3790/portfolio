@@ -64,16 +64,16 @@
 
 	.header__menu-btn {
 		pointer-events: auto;
-		font-size: var(--text-xs);
-		padding: var(--space-1) var(--space-3);
+		font-size: var(--text-sm);
+		padding: var(--space-2) var(--space-5);
 		height: auto;
-		line-height: 1.2;
+		line-height: 1.4;
 
 		/* Glassy default state */
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-		border: 1px solid transparent;
+		background: rgba(255, 255, 255, 0.08);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.15);
 		border-radius: 100px;
 		color: var(--color-text);
 		transition:

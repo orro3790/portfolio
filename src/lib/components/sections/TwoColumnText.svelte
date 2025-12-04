@@ -21,13 +21,6 @@
 
 	let visible = $state(false);
 
-	// Auto-trigger after mount as fallback
-	$effect(() => {
-		const timer = setTimeout(() => {
-			if (!visible) visible = true;
-		}, 400);
-		return () => clearTimeout(timer);
-	});
 
 	// Split body into paragraphs
 	const paragraphs = $derived(body.split('\n\n').filter((p) => p.trim()));

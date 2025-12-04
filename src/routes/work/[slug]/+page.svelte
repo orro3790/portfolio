@@ -1,18 +1,23 @@
 <script lang="ts">
+	/**
+	 * Project detail page — renders dynamic project content sections.
+	 * Section types defined in documentation/agent-guidelines/project-layouts.md
+	 */
 	import { inView } from '$lib/actions/inView';
 	import Footer from '$lib/components/Footer.svelte';
-	// Section components
-	import TextReveal from '$lib/components/sections/TextReveal.svelte';
+	import { getProjectBySlug, getNextProject } from '$lib/data/projects';
+
+	// Layout section components (documented in project-layouts.md)
+	import TGridSection from '$lib/components/sections/TGridSection.svelte';
 	import FullBleedImage from '$lib/components/sections/FullBleedImage.svelte';
+	import Carousel from '$lib/components/sections/Carousel.svelte';
+	import AsymmetricGrid from '$lib/components/sections/AsymmetricGrid.svelte';
+	import Diagonal from '$lib/components/sections/Diagonal.svelte';
+
+	// General-purpose layout sections
 	import TwoColumnText from '$lib/components/sections/TwoColumnText.svelte';
 	import ImageGrid from '$lib/components/sections/ImageGrid.svelte';
-	import DoubleImage from '$lib/components/sections/DoubleImage.svelte';
-	// Layout-driven section components
-	import TGridSection from '$lib/components/sections/TGridSection.svelte';
-	import Carousel from '$lib/components/sections/Carousel.svelte';
-	import Diagonal from '$lib/components/sections/Diagonal.svelte';
-	import AsymmetricGrid from '$lib/components/sections/AsymmetricGrid.svelte';
-	import { getProjectBySlug, getNextProject } from '$lib/data/projects';
+	import QuadGrid from '$lib/components/sections/QuadGrid.svelte';
 	import { error } from '@sveltejs/kit';
 
 	interface Props {
@@ -84,9 +89,13 @@
 					<TGridSection
 						text={section.text}
 						eyebrow={section.eyebrow}
-						variant={section.type === 't-grid-hero' ? 'hero' : section.type === 't-grid-right' ? 'right' : 'left'}
+						variant={section.type === 't-grid-hero'
+							? 'hero'
+							: section.type === 't-grid-right'
+								? 'right'
+								: 'left'}
 					/>
-				<!-- Full-width image -->
+					<!-- Full-width image -->
 				{:else if section.type === 'fw-std-53' && section.media?.[0]}
 					<FullBleedImage
 						src={section.media[0].src}
@@ -95,13 +104,17 @@
 						aspectRatio="5/3"
 						revealFrom="bottom"
 					/>
-				<!-- Carousel -->
+					<!-- Carousel -->
 				{:else if section.type === 'carousel' && section.media}
 					<Carousel
-						images={section.media.map((m) => ({ src: m.src, alt: m.alt || '', caption: m.caption }))}
+						images={section.media.map((m) => ({
+							src: m.src,
+							alt: m.alt || '',
+							caption: m.caption
+						}))}
 						initialIndex={section.initialIndex}
 					/>
-				<!-- Asymmetric Grid (unified replacement for TriGrid + DGU) -->
+					<!-- Asymmetric Grid -->
 				{:else if section.type === 'asymmetric-grid' && section.media && section.media.length >= 2 && section.largePosition && section.smallPosition}
 					<AsymmetricGrid
 						largePosition={section.largePosition}
@@ -110,19 +123,13 @@
 						imageSmall={{ src: section.media[1].src, alt: section.media[1].alt || '' }}
 						textContent={section.textContent}
 					/>
-				<!-- Diagonal -->
+					<!-- Diagonal -->
 				{:else if section.type === 'diagonal' && section.media && section.media.length >= 2}
 					<Diagonal
 						imageLarge={{ src: section.media[0].src, alt: section.media[0].alt || '' }}
 						imageSmall={{ src: section.media[1].src, alt: section.media[1].alt || '' }}
 					/>
-				<!-- Animated section templates -->
-				{:else if section.type === 'text-reveal' && section.text}
-					<TextReveal
-						text={section.text}
-						eyebrow={section.eyebrow}
-						align={section.layout === 'center' ? 'center' : 'left'}
-					/>
+					<!-- General-purpose layout sections -->
 				{:else if section.type === 'full-bleed-image' && section.media?.[0]}
 					<FullBleedImage
 						src={section.media[0].src}
@@ -139,63 +146,35 @@
 					/>
 				{:else if section.type === 'image-grid' && section.media}
 					<ImageGrid images={section.media.map((m) => ({ src: m.src, alt: m.alt || '' }))} />
-				{:else if section.type === 'double-image' && section.media && section.media.length >= 2}
-					<DoubleImage 
+				{:else if section.type === 'quad-grid' && section.media && section.media.length >= 4}
+					<QuadGrid
 						images={[
-							{ src: section.media[0].src, alt: section.media[0].alt || '', caption: section.media[0].caption },
-							{ src: section.media[1].src, alt: section.media[1].alt || '', caption: section.media[1].caption }
+							{
+								src: section.media[0].src,
+								alt: section.media[0].alt || '',
+								caption: section.media[0].caption
+							},
+							{
+								src: section.media[1].src,
+								alt: section.media[1].alt || '',
+								caption: section.media[1].caption
+							},
+							{
+								src: section.media[2].src,
+								alt: section.media[2].alt || '',
+								caption: section.media[2].caption
+							},
+							{
+								src: section.media[3].src,
+								alt: section.media[3].alt || '',
+								caption: section.media[3].caption
+							}
 						]}
 						gap={section.gap}
 						aspectRatio={section.aspectRatio}
 					/>
-				<!-- Legacy section types -->
-				{:else if section.type === 'text' && section.text}
-					<section class="project__section project__section--text" use:inView>
-						<div class="container">
-							{#if section.title}
-								<h2 class="project__section-title reveal" use:inView>
-									{section.title}
-								</h2>
-							{/if}
-							<p class="project__section-text reveal reveal-delay-1" use:inView>
-								{section.text}
-							</p>
-						</div>
-					</section>
-				{:else if section.type === 'fullwidth' && section.media}
-					<FullBleedImage
-						src={section.media[0].src}
-						alt={section.media[0].alt || ''}
-						caption={section.media[0].caption}
-						revealFrom="bottom"
-					/>
-				{:else if section.type === 'grid' && section.media}
-					<ImageGrid images={section.media.map((m) => ({ src: m.src, alt: m.alt || '' }))} />
 				{/if}
 			{/each}
-		{/if}
-
-		<!-- Next Project Link -->
-		{#if nextProject}
-			<section class="project__next">
-				<a href="/work/{nextProject.slug}" class="project__next-link" use:inView>
-					<span class="project__next-label">Next Project</span>
-					<span class="project__next-title reveal" use:inView>
-						{nextProject.title}
-					</span>
-					<svg
-						class="project__next-arrow"
-						width="48"
-						height="48"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="1.5"
-					>
-						<path d="M7 17L17 7M17 7H7M17 7V17" />
-					</svg>
-				</a>
-			</section>
 		{/if}
 	</article>
 {/if}
@@ -381,48 +360,33 @@
 
 	/* Next Project */
 	.project__next {
-		padding: var(--space-24) var(--space-6);
-		border-top: 1px solid var(--color-border);
-	}
-
-	.project__next-link {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		text-decoration: none;
-		color: var(--color-text);
-		transition: color var(--transition-fast);
+		justify-content: center;
+		padding: var(--space-16) var(--space-6);
 	}
 
-	.project__next-link:hover {
-		color: var(--color-accent);
-	}
-
-	.project__next-label {
+	.project__next-btn {
 		font-family: var(--font-body);
 		font-size: var(--text-sm);
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--color-text-muted);
-		margin-bottom: var(--space-4);
+		padding: var(--space-2) var(--space-5);
+		line-height: 1.4;
+		text-decoration: none;
+		color: var(--color-text);
+		background: rgba(255, 255, 255, 0.08);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 100px;
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast),
+			transform var(--transition-fast);
 	}
 
-	.project__next-title {
-		font-family: var(--font-display);
-		font-size: clamp(var(--text-4xl), 8vw, var(--text-6xl));
-		font-weight: 300;
-		line-height: 1.1;
-		margin-bottom: var(--space-6);
-	}
-
-	.project__next-arrow {
-		transition: transform var(--transition-base);
-	}
-
-	.project__next-link:hover .project__next-arrow {
-		transform: translate(4px, -4px);
+	.project__next-btn:hover {
+		background: transparent;
+		border-color: var(--color-text);
+		transform: scale(1.05);
 	}
 
 	/* Reveal animations */
