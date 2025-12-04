@@ -143,7 +143,7 @@ export const projects: Project[] = [
 		},
 		sections: [
 			{
-				type: 'fullwidth',
+				type: 'full-bleed-image',
 				media: [
 					{
 						type: 'image',
@@ -153,9 +153,9 @@ export const projects: Project[] = [
 				]
 			},
 			{
-				type: 'text',
-				title: 'Process',
-				text: "Each piece in this series combines found materials from urban environments with original photography. The layering technique creates depth and tells stories of the city's hidden narratives."
+				type: 't-grid-left',
+				eyebrow: 'Process',
+				text: "Each piece in this series combines found materials\nfrom urban environments with original photography.\nThe layering technique creates depth and tells\nstories of the city's hidden narratives."
 			}
 		]
 	},
@@ -178,7 +178,7 @@ export const projects: Project[] = [
 		},
 		sections: [
 			{
-				type: 'fullwidth',
+				type: 'full-bleed-image',
 				media: [
 					{
 						type: 'image',
@@ -208,7 +208,7 @@ export const projects: Project[] = [
 		},
 		sections: [
 			{
-				type: 'fullwidth',
+				type: 'full-bleed-image',
 				media: [
 					{
 						type: 'image',
@@ -238,7 +238,7 @@ export const projects: Project[] = [
 		},
 		sections: [
 			{
-				type: 'fullwidth',
+				type: 'full-bleed-image',
 				media: [
 					{
 						type: 'image',
@@ -268,7 +268,7 @@ export const projects: Project[] = [
 		},
 		sections: [
 			{
-				type: 'fullwidth',
+				type: 'full-bleed-image',
 				media: [
 					{
 						type: 'image',
@@ -300,7 +300,8 @@ export const navItemsWithPreview: NavItemWithPreview[] = projects.map((p) => ({
 	heroImage: p.heroImage,
 	backgroundImage: p.backgroundImage,
 	accentColor: p.accentColor,
-	preview: p.preview
+	preview: p.preview,
+	animationTemplate: p.preview?.animationTemplate
 }));
 
 /**

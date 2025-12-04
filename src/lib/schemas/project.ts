@@ -41,7 +41,9 @@ export const sectionSchema = z.object({
 		// Asymmetric grid
 		'asymmetric-grid',
 		// Diagonal layout
-		'diagonal'
+		'diagonal',
+		// Quad grid (2×2)
+		'quad-grid'
 	]),
 	// Media items (for image-based sections)
 	media: z.array(mediaSchema).optional(),
@@ -81,13 +83,34 @@ export const projectMetaSchema = z.object({
 export type ProjectMeta = z.infer<typeof projectMetaSchema>;
 
 /**
+ * Animation template variants for the project hover preview.
+ *
+ * Each template defines unique entry directions and positions for:
+ * - Title: Large project name
+ * - Description: Short project summary
+ * - Tags: Service/category labels
+ * - Image: Device/preview mockup
+ *
+ * Templates:
+ * - 'layers': Default. Tags↓, Title→, Desc↑, Image curtain←
+ * - 'suno': Desc→, Title←, Tags↓, Image diagonal↗
+ * - 'ro': Desc←, Title←, Tags↑, Image→ (image on LEFT)
+ * - 'atoms': Desc→, Title←, Tags↓, Image diagonal↗
+ */
+export const animationTemplateSchema = z.enum(['layers', 'suno', 'ro', 'atoms']);
+
+export type AnimationTemplate = z.infer<typeof animationTemplateSchema>;
+
+/**
  * Schema for hover preview data
  */
 export const previewSchema = z.object({
 	description: z.string(),
 	tags: z.array(z.string()),
 	backgroundColor: z.string().optional(),
-	backgroundImage: z.string().optional()
+	backgroundImage: z.string().optional(),
+	/** Animation template for hover preview. Defaults to 'layers' if not specified. */
+	animationTemplate: animationTemplateSchema.optional()
 });
 
 export type Preview = z.infer<typeof previewSchema>;
@@ -131,7 +154,9 @@ export const navItemWithPreviewSchema = z.object({
 	heroImage: z.string().optional(),
 	backgroundImage: z.string().optional(),
 	accentColor: z.string().optional(),
-	preview: previewSchema.optional()
+	preview: previewSchema.optional(),
+	/** Animation template for hover preview. Defaults to 'layers' if not specified. */
+	animationTemplate: animationTemplateSchema.optional()
 });
 
 export type NavItemWithPreview = z.infer<typeof navItemWithPreviewSchema>;

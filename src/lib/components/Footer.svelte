@@ -7,7 +7,7 @@
 		instagram?: string;
 	}
 
-	let { email = 'jua1209@naver.com ', instagram = '#' }: Props = $props();
+	let { email = 'jua1209@naver.com', instagram }: Props = $props();
 
 	const year = new Date().getFullYear();
 </script>
@@ -17,8 +17,10 @@
 		<a href="mailto:{email}" class="footer__email">{email}</a>
 
 		<nav class="footer__links">
-			<a href={instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
-			<span class="footer__divider">·</span>
+			{#if instagram}
+				<a href={instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
+				<span class="footer__divider">·</span>
+			{/if}
 			<span class="footer__copyright">© {year}</span>
 		</nav>
 	</div>

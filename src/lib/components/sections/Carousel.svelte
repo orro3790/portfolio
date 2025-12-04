@@ -1,10 +1,25 @@
 <script lang="ts">
 	/**
-	 * Carousel Section — Horizontal scroll carousel with drag interaction.
-	 * Based on project-layouts.md Carousel-3P specification:
-	 * - Center image [b]: Fully visible, centered
-	 * - Adjacent images [a] and [c]: Partially visible at edges (peek effect)
-	 * - Drag to scroll interaction with custom cursor
+	 * @component Carousel
+	 * Horizontal scroll carousel with drag/swipe interaction and peek effect.
+	 *
+	 * Features:
+	 * - Center-focused layout with adjacent images partially visible
+	 * - Mouse drag and touch swipe support
+	 * - Smooth eased scrolling (Lenis-style expo easing)
+	 * - Curtain reveal animation with staggered timing
+	 *
+	 * @example
+	 * ```svelte
+	 * <Carousel
+	 *   images={[
+	 *     { src: '/image1.jpg', alt: 'First image', caption: 'Optional caption' },
+	 *     { src: '/image2.jpg', alt: 'Second image' }
+	 *   ]}
+	 *   initialIndex={1}
+	 *   aspectRatio="4/3"
+	 * />
+	 * ```
 	 */
 	import { inview } from '$lib/actions/inView';
 
@@ -17,9 +32,9 @@
 	interface Props {
 		/** Array of images to display in the carousel */
 		images: CarouselImage[];
-		/** Aspect ratio for images (default: 3/4 for portrait-style) */
+		/** CSS aspect ratio for images (default: '3/4' for portrait-style) */
 		aspectRatio?: string;
-		/** Initial slide index (0-based, default: 2 for 3rd image) */
+		/** Initial slide index to center on (0-based, default: 2) */
 		initialIndex?: number;
 	}
 
@@ -27,39 +42,69 @@
 
 	let visible = $state(false);
 	let scrollContainer: HTMLDivElement | undefined = $state();
-	let carouselElement: HTMLElement | undefined = $state();
-	let activeIndex = $state(initialIndex);
+	// Track which slide is currently centered (updated by scroll/drag).
+	let activeIndex = $state(getInitialIndex());
+
+	/** Returns validated initial index within bounds */
+	function getInitialIndex(): number {
+		return Math.max(0, Math.min(initialIndex, images.length - 1));
+	}
 
 	// Drag state
 	let isDragging = $state(false);
 	let startX = $state(0);
 	let scrollLeft = $state(0);
 
-	// Custom cursor state
-	let isHovering = $state(false);
-	let cursorX = $state(0);
-	let cursorY = $state(0);
+	// Animation state for smooth scrolling
+	let animationId: number | null = null;
 
-	// Calculate scroll position to center an item
-	function scrollToIndex(index: number, smooth = true) {
-		if (!scrollContainer) return;
-		const items = scrollContainer.querySelectorAll('.carousel__item');
-		const item = items[index] as HTMLElement;
-		if (!item) return;
-
-		const containerWidth = scrollContainer.offsetWidth;
-		const itemLeft = item.offsetLeft;
-		const itemWidth = item.offsetWidth;
-		// Center the item in the viewport
-		const scrollPos = itemLeft - (containerWidth - itemWidth) / 2;
-
-		scrollContainer.scrollTo({ left: scrollPos, behavior: smooth ? 'smooth' : 'instant' });
-		activeIndex = index;
+	/** Expo easing out (same as Lenis) - creates smooth deceleration */
+	function easeOutExpo(t: number): number {
+		return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
 	}
 
-	// Handle scroll to update active index
-	function handleScroll() {
-		if (!scrollContainer || isDragging) return;
+	/**
+	 * Smoothly animates scroll to target position using RAF and expo easing.
+	 * @param targetScroll - Target scroll position
+	 * @param duration - Animation duration in ms (default: 800)
+	 */
+	function smoothScrollTo(targetScroll: number, duration = 800) {
+		if (!scrollContainer) return;
+
+		// Cancel any ongoing animation
+		if (animationId !== null) {
+			cancelAnimationFrame(animationId);
+		}
+
+		const startScroll = scrollContainer.scrollLeft;
+		const distance = targetScroll - startScroll;
+		const startTime = performance.now();
+
+		function animate(currentTime: number) {
+			if (!scrollContainer) return;
+
+			const elapsed = currentTime - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+			const easedProgress = easeOutExpo(progress);
+
+			scrollContainer.scrollLeft = startScroll + distance * easedProgress;
+
+			if (progress < 1) {
+				animationId = requestAnimationFrame(animate);
+			} else {
+				animationId = null;
+			}
+		}
+
+		animationId = requestAnimationFrame(animate);
+	}
+
+	/**
+	 * Finds the index of the carousel item closest to the viewport center.
+	 * @returns Index of the closest item, or 0 if container is unavailable
+	 */
+	function findClosestIndex(): number {
+		if (!scrollContainer) return 0;
 		const items = scrollContainer.querySelectorAll('.carousel__item');
 		const containerCenter = scrollContainer.scrollLeft + scrollContainer.offsetWidth / 2;
 
@@ -76,55 +121,89 @@
 			}
 		});
 
-		activeIndex = closestIndex;
+		return closestIndex;
 	}
 
-	// Drag handlers
+	/**
+	 * Calculates the scroll position to center an item.
+	 * @param index - Index of the item
+	 * @returns Scroll position, or null if invalid
+	 */
+	function getScrollPositionForIndex(index: number): number | null {
+		if (!scrollContainer) return null;
+		const items = scrollContainer.querySelectorAll('.carousel__item');
+		const item = items[index] as HTMLElement;
+		if (!item) return null;
+
+		const containerWidth = scrollContainer.offsetWidth;
+		const itemLeft = item.offsetLeft;
+		const itemWidth = item.offsetWidth;
+		return itemLeft - (containerWidth - itemWidth) / 2;
+	}
+
+	/**
+	 * Scrolls to center a specific item in the viewport.
+	 * @param index - Index of the item to scroll to
+	 * @param animated - Whether to animate the scroll (default: true)
+	 */
+	function scrollToIndex(index: number, animated = true) {
+		const scrollPos = getScrollPositionForIndex(index);
+		if (scrollPos === null || !scrollContainer) return;
+
+		if (animated) {
+			smoothScrollTo(scrollPos);
+		} else {
+			scrollContainer.scrollLeft = scrollPos;
+		}
+		activeIndex = index;
+	}
+
+	/** Updates activeIndex based on scroll position (skipped while dragging/animating) */
+	function handleScroll() {
+		if (!scrollContainer || isDragging || animationId !== null) return;
+		activeIndex = findClosestIndex();
+	}
+
+	// --- Mouse drag handlers ---
 	function handleMouseDown(e: MouseEvent) {
 		if (!scrollContainer) return;
+		// Cancel any ongoing smooth scroll
+		if (animationId !== null) {
+			cancelAnimationFrame(animationId);
+			animationId = null;
+		}
 		isDragging = true;
 		startX = e.pageX - scrollContainer.offsetLeft;
 		scrollLeft = scrollContainer.scrollLeft;
-		scrollContainer.style.scrollBehavior = 'auto';
 	}
 
 	function handleMouseMove(e: MouseEvent) {
-		// Update custom cursor position
-		if (carouselElement) {
-			const rect = carouselElement.getBoundingClientRect();
-			cursorX = e.clientX - rect.left;
-			cursorY = e.clientY - rect.top;
-		}
-
 		if (!isDragging || !scrollContainer) return;
 		e.preventDefault();
 		const x = e.pageX - scrollContainer.offsetLeft;
-		const walk = (x - startX) * 1.5; // Multiply for faster scroll
+		const walk = (x - startX) * 2;
 		scrollContainer.scrollLeft = scrollLeft - walk;
 	}
 
 	function handleMouseUp() {
-		if (!scrollContainer) return;
+		if (!scrollContainer || !isDragging) return;
 		isDragging = false;
-		scrollContainer.style.scrollBehavior = 'smooth';
-		// Snap to nearest item
-		handleScroll();
+		// Snap to nearest with smooth animation
+		scrollToIndex(findClosestIndex(), true);
 	}
 
 	function handleMouseLeave() {
-		isHovering = false;
-		if (isDragging) {
-			handleMouseUp();
-		}
+		if (isDragging) handleMouseUp();
 	}
 
-	function handleMouseEnter() {
-		isHovering = true;
-	}
-
-	// Touch handlers for mobile
+	// --- Touch handlers ---
 	function handleTouchStart(e: TouchEvent) {
 		if (!scrollContainer) return;
+		// Cancel any ongoing smooth scroll
+		if (animationId !== null) {
+			cancelAnimationFrame(animationId);
+			animationId = null;
+		}
 		isDragging = true;
 		startX = e.touches[0].pageX - scrollContainer.offsetLeft;
 		scrollLeft = scrollContainer.scrollLeft;
@@ -133,43 +212,54 @@
 	function handleTouchMove(e: TouchEvent) {
 		if (!isDragging || !scrollContainer) return;
 		const x = e.touches[0].pageX - scrollContainer.offsetLeft;
-		const walk = (x - startX) * 1.5;
+		const walk = (x - startX) * 2;
 		scrollContainer.scrollLeft = scrollLeft - walk;
 	}
 
 	function handleTouchEnd() {
+		if (!scrollContainer || !isDragging) return;
 		isDragging = false;
-		handleScroll();
+		// Snap to nearest with smooth animation
+		scrollToIndex(findClosestIndex(), true);
 	}
 
-
-	// Center initial image on mount (start at photo 3 = index 2)
+	// Center initial image once visible and container is ready
 	$effect(() => {
 		if (visible && scrollContainer) {
-			// Delay to ensure layout is computed, use instant scroll for initial position
-			setTimeout(() => scrollToIndex(initialIndex, false), 100);
+			// Use RAF to ensure layout is computed before positioning
+			requestAnimationFrame(() => {
+				scrollToIndex(initialIndex, false);
+			});
 		}
+	});
+
+	// Cleanup animation on unmount
+	$effect(() => {
+		return () => {
+			if (animationId !== null) {
+				cancelAnimationFrame(animationId);
+			}
+		};
 	});
 </script>
 
 <section
 	class="carousel"
 	class:visible
-	class:hovering={isHovering}
-	bind:this={carouselElement}
 	use:inview={{ threshold: 0.1 }}
 	oninview={() => (visible = true)}
-	onmouseenter={handleMouseEnter}
-	onmouseleave={handleMouseLeave}
-	onmousemove={handleMouseMove}
+	aria-label="Image gallery"
 >
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		class="carousel__track"
 		class:dragging={isDragging}
 		bind:this={scrollContainer}
 		onscroll={handleScroll}
 		onmousedown={handleMouseDown}
+		onmousemove={handleMouseMove}
 		onmouseup={handleMouseUp}
+		onmouseleave={handleMouseLeave}
 		ontouchstart={handleTouchStart}
 		ontouchmove={handleTouchMove}
 		ontouchend={handleTouchEnd}
@@ -177,13 +267,15 @@
 		aria-label="Image carousel - drag to scroll"
 		aria-roledescription="carousel"
 	>
-		{#each images as image, i}
+		{#each images as image, i (image.src)}
 			<div
 				class="carousel__item"
 				class:active={activeIndex === i}
-				style="--aspect-ratio: {aspectRatio}; --delay: {i * 80}ms"
+				style="--aspect-ratio: {aspectRatio}; --curtain-delay: {i * 120}ms"
 			>
 				<div class="carousel__image-wrapper">
+					<!-- Curtain reveal overlay -->
+					<div class="carousel__curtain" aria-hidden="true"></div>
 					<img src={image.src} alt={image.alt} loading="lazy" draggable="false" />
 					<!-- Placeholder for missing images -->
 					<div class="carousel__placeholder" aria-hidden="true">
@@ -196,17 +288,6 @@
 			</div>
 		{/each}
 	</div>
-
-	<!-- Custom cursor that follows mouse -->
-	<div
-		class="carousel__cursor"
-		class:active={isHovering}
-		class:dragging={isDragging}
-		style="transform: translate({cursorX}px, {cursorY}px)"
-		aria-hidden="true"
-	>
-		<span>{isDragging ? 'drag' : 'drag'}</span>
-	</div>
 </section>
 
 <style>
@@ -215,16 +296,17 @@
 		overflow: hidden;
 		width: 100%;
 		position: relative;
-		/* Hide default cursor when hovering */
-		cursor: none;
+		cursor: grab;
+	}
+
+	.carousel:active {
+		cursor: grabbing;
 	}
 
 	.carousel__track {
 		display: flex;
-		gap: var(--space-6);
+		gap: var(--space-24);
 		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		scroll-behavior: smooth;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
 		/* 
@@ -235,9 +317,12 @@
 		 */
 		padding-left: 25%;
 		padding-right: 25%;
-		/* Hide cursor on track too */
-		cursor: none;
+		cursor: grab;
 		user-select: none;
+	}
+
+	.carousel__track.dragging {
+		cursor: grabbing;
 	}
 
 	.carousel__track::-webkit-scrollbar {
@@ -249,29 +334,13 @@
 		flex: 0 0 50%;
 		min-width: 300px;
 		max-width: 500px;
-		scroll-snap-align: center;
-		/* Initial state for animation */
-		opacity: 0;
-		transform: translateY(20px);
-		transition:
-			opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-			transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-		transition-delay: var(--delay);
-		/* Prevent image dragging */
+		/* Dim non-active items */
+		opacity: 0.6;
+		transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 		pointer-events: none;
 	}
 
-	.carousel.visible .carousel__item {
-		opacity: 1;
-		transform: translateY(0);
-	}
-
-	/* Dim non-active items slightly */
-	.carousel.visible .carousel__item:not(.active) {
-		opacity: 0.6;
-	}
-
-	.carousel.visible .carousel__item.active {
+	.carousel__item.active {
 		opacity: 1;
 	}
 
@@ -295,6 +364,33 @@
 		object-fit: cover;
 		pointer-events: none;
 		-webkit-user-drag: none;
+		/* Initial zoomed state for reveal animation */
+		transform: scale(1.1);
+		transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+		transition-delay: var(--curtain-delay);
+	}
+
+	/* Subtle zoom-out as curtain reveals */
+	.carousel.visible .carousel__image-wrapper img {
+		transform: scale(1);
+	}
+
+	/* Curtain reveal overlay */
+	.carousel__curtain {
+		position: absolute;
+		inset: 0;
+		background-color: var(--color-bg);
+		z-index: 2;
+		transform-origin: top;
+		transform: scaleY(1);
+		transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+		transition-delay: var(--curtain-delay);
+	}
+
+	/* Curtain slides away when visible */
+	.carousel.visible .carousel__curtain {
+		transform: scaleY(0);
+		transform-origin: bottom;
 	}
 
 	/* Placeholder for missing images */
@@ -316,7 +412,7 @@
 	}
 
 	/* Hide placeholder when image loads */
-	.carousel__image-wrapper img:not([src='']):not([src*='placeholder']) + .carousel__placeholder {
+	.carousel__image-wrapper img:not([src='']):not([src*='placeholder']) ~ .carousel__placeholder {
 		display: none;
 	}
 
@@ -326,54 +422,18 @@
 		font-size: var(--text-sm);
 		color: var(--color-text-muted);
 		text-align: center;
-	}
-
-	/* Custom cursor */
-	.carousel__cursor {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 80px;
-		height: 80px;
-		margin-left: -40px;
-		margin-top: -40px;
-		border-radius: 50%;
-		border: 1px solid var(--color-text);
-		background-color: transparent;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		pointer-events: none;
+		/* Fade in after curtain reveals */
 		opacity: 0;
+		transform: translateY(12px);
 		transition:
-			opacity 0.2s ease,
-			transform 0.05s linear,
-			background-color 0.2s ease,
-			border-color 0.2s ease;
-		z-index: 100;
-		will-change: transform;
+			opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+			transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+		transition-delay: calc(var(--curtain-delay) + 0.6s);
 	}
 
-	.carousel__cursor.active {
+	.carousel.visible .carousel__caption {
 		opacity: 1;
-	}
-
-	.carousel__cursor.dragging {
-		background-color: var(--color-text);
-		border-color: var(--color-text);
-	}
-
-	.carousel__cursor.dragging span {
-		color: var(--color-bg);
-	}
-
-	.carousel__cursor span {
-		font-family: var(--font-body);
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--color-text);
-		transition: color 0.2s ease;
+		transform: translateY(0);
 	}
 
 	/* Responsive adjustments */
@@ -401,23 +461,6 @@
 			padding-left: 12.5%;
 			padding-right: 12.5%;
 			gap: var(--space-4);
-		}
-
-		/* Hide custom cursor on touch devices */
-		.carousel {
-			cursor: grab;
-		}
-
-		.carousel__track {
-			cursor: grab;
-		}
-
-		.carousel__track.dragging {
-			cursor: grabbing;
-		}
-
-		.carousel__cursor {
-			display: none;
 		}
 	}
 </style>

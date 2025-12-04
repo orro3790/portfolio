@@ -90,20 +90,34 @@ export function inview(node: HTMLElement, options: InviewOptions = {}) {
 
 	observer.observe(node);
 
+	let currentObserver = observer;
+
 	return {
 		destroy() {
-			observer.disconnect();
+			currentObserver.disconnect();
 		},
 		update(newOptions: InviewOptions) {
-			observer.disconnect();
-			const { threshold: t = 0.2, rootMargin: r = '0px' } = newOptions;
-			const newObserver = new IntersectionObserver(
+			currentObserver.disconnect();
+			const { threshold: t = 0.2, rootMargin: r = '0px', once: o = true } = newOptions;
+			hasTriggered = false;
+
+			currentObserver = new IntersectionObserver(
 				(entries) => {
 					entries.forEach((entry) => {
-						if (entry.isIntersecting) {
+						if (entry.isIntersecting && (!o || !hasTriggered)) {
+							hasTriggered = true;
 							node.dispatchEvent(
 								new CustomEvent<InviewEvent>('inview', {
 									detail: { inView: true, entry }
+								})
+							);
+							if (o) {
+								currentObserver.unobserve(node);
+							}
+						} else if (!entry.isIntersecting && !o) {
+							node.dispatchEvent(
+								new CustomEvent<InviewEvent>('inview', {
+									detail: { inView: false, entry }
 								})
 							);
 						}
@@ -111,7 +125,7 @@ export function inview(node: HTMLElement, options: InviewOptions = {}) {
 				},
 				{ threshold: t, rootMargin: r }
 			);
-			newObserver.observe(node);
+			currentObserver.observe(node);
 		}
 	};
 }
