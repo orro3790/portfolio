@@ -1,0 +1,408 @@
+/* ==========================================================================
+   Art Portfolio – Global Styles (Metalab-inspired)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CSS Custom Properties (Design Tokens)
+   -------------------------------------------------------------------------- */
+
+:root {
+	/* Colors */
+	--color-bg: #0a0a0a;
+	--color-bg-elevated: #141414;
+	--color-text: #f5f5f5;
+	--color-text-muted: #888888;
+	--color-accent: #6366f1;
+	--color-border: #2a2a2a;
+
+	/* Typography */
+	--font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+	--font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+
+	/* Font sizes */
+	--text-xs: 0.75rem;
+	--text-sm: 0.875rem;
+	--text-base: 1rem;
+	--text-lg: 1.125rem;
+	--text-xl: 1.25rem;
+	--text-2xl: 1.5rem;
+	--text-3xl: 2rem;
+	--text-4xl: 2.5rem;
+	--text-5xl: 3.5rem;
+	--text-6xl: 5rem;
+	--text-7xl: 7rem;
+	--text-8xl: 9rem;
+
+	/* Spacing */
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-5: 1.25rem;
+	--space-6: 1.5rem;
+	--space-8: 2rem;
+	--space-10: 2.5rem;
+	--space-12: 3rem;
+	--space-16: 4rem;
+	--space-20: 5rem;
+	--space-24: 6rem;
+	--space-32: 8rem;
+
+	/* Layout */
+	--max-width: 1400px;
+	--header-height: 80px;
+	--sidebar-width: 200px;
+
+	/* Gap and Gutter */
+	--gutter: 1.5rem;
+
+	/* Transitions */
+	--transition-fast: 150ms ease;
+	--transition-base: 300ms ease;
+	--transition-slow: 500ms ease;
+	--transition-reveal: 800ms cubic-bezier(0.16, 1, 0.3, 1);
+
+	/* Z-index layers */
+	--z-base: 0;
+	--z-elevated: 10;
+	--z-sticky: 100;
+	--z-overlay: 1000;
+	--z-modal: 2000;
+}
+
+/* --------------------------------------------------------------------------
+   2. CSS Reset & Base Styles
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	font-size: 16px;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+	scroll-behavior: smooth;
+}
+
+body {
+	font-family: var(--font-body);
+	font-size: var(--text-base);
+	line-height: 1.6;
+	color: var(--color-text);
+	background-color: var(--color-bg);
+	min-height: 100vh;
+	overflow-x: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   3. Typography
+   -------------------------------------------------------------------------- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-display);
+	font-weight: 300;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+}
+
+h1 {
+	font-size: clamp(var(--text-5xl), 12vw, var(--text-8xl));
+}
+
+h2 {
+	font-size: clamp(var(--text-4xl), 8vw, var(--text-6xl));
+}
+
+h3 {
+	font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+}
+
+p {
+	max-width: 65ch;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	transition: color var(--transition-fast);
+}
+
+a:hover {
+	color: var(--color-accent);
+}
+
+/* Small caps for labels */
+.label {
+	font-family: var(--font-body);
+	font-size: var(--text-sm);
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--color-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout Utilities
+   -------------------------------------------------------------------------- */
+
+.container {
+	width: 100%;
+	max-width: var(--max-width);
+}
+
+.section {
+	padding: var(--space-24) 0;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   5. Button Styles
+   -------------------------------------------------------------------------- */
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-2);
+	padding: var(--space-2) var(--space-4);
+	font-family: var(--font-body);
+	font-size: var(--text-sm);
+	font-weight: 500;
+	color: var(--color-text);
+	background: transparent;
+	border: 1px solid var(--color-border);
+	border-radius: 100px;
+	cursor: pointer;
+	transition:
+		background-color var(--transition-fast),
+		border-color var(--transition-fast),
+		color var(--transition-fast);
+}
+
+.btn:hover {
+	background-color: var(--color-text);
+	border-color: var(--color-text);
+	color: var(--color-bg);
+}
+
+.btn--primary {
+	background-color: var(--color-text);
+	border-color: var(--color-text);
+	color: var(--color-bg);
+}
+
+.btn--primary:hover {
+	background-color: transparent;
+	color: var(--color-text);
+}
+
+/* --------------------------------------------------------------------------
+   6. Animation Classes
+   -------------------------------------------------------------------------- */
+
+/* Scroll-triggered reveal animation */
+.reveal {
+	opacity: 0;
+	transform: translateY(40px);
+	transition:
+		opacity var(--transition-reveal),
+		transform var(--transition-reveal);
+}
+
+.reveal[data-visible='true'] {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Staggered animation delays */
+.reveal-delay-1 {
+	transition-delay: 100ms;
+}
+.reveal-delay-2 {
+	transition-delay: 200ms;
+}
+.reveal-delay-3 {
+	transition-delay: 300ms;
+}
+.reveal-delay-4 {
+	transition-delay: 400ms;
+}
+.reveal-delay-5 {
+	transition-delay: 500ms;
+}
+
+/* Fade in from different directions */
+.reveal-up {
+	transform: translateY(40px);
+}
+
+.reveal-down {
+	transform: translateY(-40px);
+}
+
+.reveal-left {
+	transform: translateX(-40px);
+}
+
+.reveal-right {
+	transform: translateX(40px);
+}
+
+.reveal-up[data-visible='true'],
+.reveal-down[data-visible='true'],
+.reveal-left[data-visible='true'],
+.reveal-right[data-visible='true'] {
+	transform: translate(0);
+}
+
+/* Scale reveal */
+.reveal-scale {
+	transform: scale(0.95);
+}
+
+.reveal-scale[data-visible='true'] {
+	transform: scale(1);
+}
+
+/* --------------------------------------------------------------------------
+   7. Image & Media
+   -------------------------------------------------------------------------- */
+
+img,
+video {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+.media-wrapper {
+	position: relative;
+	overflow: hidden;
+	background-color: var(--color-bg-elevated);
+}
+
+.media-wrapper img,
+.media-wrapper video {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* Aspect ratio utilities */
+.aspect-video {
+	aspect-ratio: 16 / 9;
+}
+
+.aspect-square {
+	aspect-ratio: 1 / 1;
+}
+
+.aspect-portrait {
+	aspect-ratio: 3 / 4;
+}
+
+/* --------------------------------------------------------------------------
+   8. Selection & Focus States
+   -------------------------------------------------------------------------- */
+
+::selection {
+	background-color: var(--color-accent);
+	color: var(--color-text);
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   9. Scrollbar Styling
+   -------------------------------------------------------------------------- */
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--color-border);
+	border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--color-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Loading States
+   -------------------------------------------------------------------------- */
+
+@keyframes shimmer {
+	0% {
+		background-position: -200% 0;
+	}
+	100% {
+		background-position: 200% 0;
+	}
+}
+
+.skeleton {
+	background: linear-gradient(
+		90deg,
+		var(--color-bg-elevated) 25%,
+		var(--color-border) 50%,
+		var(--color-bg-elevated) 75%
+	);
+	background-size: 200% 100%;
+	animation: shimmer 1.5s infinite;
+}
+
+/* View Transitions API */
+
+/* Root transition - fade for page content */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0.6s;
+	animation-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+/* Project hero image transition - expansion handled by browser morph */
+::view-transition-group(project-hero-layers),
+::view-transition-group(project-hero-ethereal-forms),
+::view-transition-group(project-hero-urban-fragments),
+::view-transition-group(project-hero-light-studies),
+::view-transition-group(project-hero-ceramic-vessels),
+::view-transition-group(project-hero-abstract-narratives),
+::view-transition-group(project-hero-nature-impressions) {
+	animation-duration: 1.2s;
+	animation-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+
+
