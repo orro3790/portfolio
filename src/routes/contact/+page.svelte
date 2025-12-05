@@ -21,6 +21,7 @@
 		portrait: siteSettings?.portrait
 			? getImageUrl(siteSettings.portrait, {width: 800, height: 1000})
 			: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&h=1000',
+		bioHeading: siteSettings?.bioHeading || 'About',
 		bio:
 			siteSettings?.bio ||
 			`Creating at the intersection of traditional craft and contemporary expression. My work explores themes of identity, memory, and the subtle beauty found in everyday moments.
@@ -65,7 +66,7 @@ Each piece is an invitation to pause, reflect, and discover something new within
 			oninview={() => (textVisible = true)}
 		>
 			<div class="contact__text-content">
-				<h2 class="contact__heading">About</h2>
+				<h2 class="contact__heading">{artist.bioHeading}</h2>
 				<div class="contact__body">
 					{#each paragraphs as paragraph, i (i)}
 						<p style="--delay: {i * 100}ms">{paragraph}</p>

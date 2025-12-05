@@ -104,6 +104,7 @@ export interface SanitySiteSettings {
   portrait?: SanityImage
   instagram?: string
   email?: string
+  bioHeading?: string
   bio?: string
   heroTitle?: string
   heroSubtitle?: string

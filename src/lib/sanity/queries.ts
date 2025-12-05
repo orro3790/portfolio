@@ -92,6 +92,7 @@ export const siteSettingsQuery = `*[_type == "siteSettings"][0] {
   portrait,
   instagram,
   email,
+  bioHeading,
   bio,
   heroTitle,
   heroSubtitle
