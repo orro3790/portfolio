@@ -156,7 +156,7 @@
 					class="preview-image-wrapper"
 					class:visible={isHovering}
 					class:navigating={isNavigating && navigatingSlug === hoveredProject.slug}
-					style="view-transition-name: project-hero"
+					style:view-transition-name={currentSlug ? undefined : 'project-hero'}
 				>
 					<img src={hoveredProject.previewImage} alt="" class="preview-image" />
 				</div>

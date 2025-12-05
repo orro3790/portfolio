@@ -122,7 +122,6 @@ code {
 /* Disable image dragging */
 img {
 	-webkit-user-drag: none;
-	user-drag: none;
 }
 
 /* --------------------------------------------------------------------------

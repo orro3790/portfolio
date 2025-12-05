@@ -1,44 +1,20 @@
 <script lang="ts">
+	/**
+	 * Root app layout sets global chrome, meta tags, and shared navigation.
+	 */
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
 	import Header from '$lib/components/Header.svelte';
 	import ProjectNav from '$lib/components/ProjectNav.svelte';
-	import PreviewBanner from '$lib/components/PreviewBanner.svelte';
-	import {onNavigate, afterNavigate} from '$app/navigation';
-	import {onMount} from 'svelte';
+	import { navItemsWithPreview } from '$lib/data/projects';
+	import { onNavigate, afterNavigate } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import Lenis from 'lenis';
-	import {lenisStore} from '$lib/stores/lenis';
-	import {getImageUrl} from '$lib/sanity/imageUrl';
-	import type {SanityNavItem} from '$lib/sanity/types';
+	import { lenisStore } from '$lib/stores/lenis';
 
-	let {children, data} = $props();
+	let { children } = $props();
 
-	/** Site title from CMS or fallback */
-	const siteTitle = data.siteSettings?.siteTitle || 'Portfolio';
-
-	/**
-	 * Transform Sanity nav items to the format expected by ProjectNav.
-	 */
-	function transformNavItems(items: SanityNavItem[]) {
-		return items.map((item) => ({
-			title: item.title,
-			slug: item.slug,
-			previewImage: getImageUrl(item.previewImage, {width: 600}),
-			backgroundImage: item.backgroundImage
-				? getImageUrl(item.backgroundImage, {width: 1200})
-				: undefined,
-			accentColor: item.accentColor,
-			/** Animation template at top level for ProjectNav */
-			animationTemplate: item.animationTemplate || 'layers',
-			preview: {
-				description: item.previewDescription || '',
-				tags: item.previewTags || [],
-			},
-		}));
-	}
-
-	/** Navigation items transformed for ProjectNav component */
-	let navItemsWithPreview = $derived(data.navigation ? transformNavItems(data.navigation) : []);
+	/** Site title displayed in browser tab */
+	const siteTitle = 'Portfolio';
 
 	let lenis: Lenis | null = $state(null);
 
@@ -71,38 +47,34 @@
 		};
 	});
 
+	// Reset scroll position on navigation
+	afterNavigate(() => {
+		lenis?.scrollTo(0, { immediate: true });
+	});
+
 	// Enable View Transitions API for smooth page transitions
 	onNavigate((navigation) => {
+		// Only use view transitions for project pages
 		if (!document.startViewTransition) return;
 
 		return new Promise((resolve) => {
-			// Stop Lenis smooth scrolling during view transition to prevent interference
-			lenis?.stop();
-
-			// Reset scroll BEFORE the view transition starts (synchronously)
-			// This ensures the "after" snapshot captures the page at scroll position 0
-			window.scrollTo(0, 0);
-
 			document.startViewTransition(async () => {
 				resolve();
 				await navigation.complete;
 			});
 		});
 	});
-
-	// Resume Lenis after navigation completes
-	afterNavigate(() => {
-		// Small delay to let view transition finish, then resume Lenis
-		requestAnimationFrame(() => {
-			lenis?.start();
-		});
-	});
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
 	<title>{siteTitle}</title>
 	<meta name="description" content="Art portfolio showcasing creative works" />
+	<meta name="theme-color" content="#ffffff" />
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+	<link rel="manifest" href="/site.webmanifest" />
+	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
 <div class="app">
@@ -112,10 +84,6 @@
 	<main class="main">
 		{@render children()}
 	</main>
-
-	{#if data.isPreview}
-		<PreviewBanner />
-	{/if}
 </div>
 
 <style>

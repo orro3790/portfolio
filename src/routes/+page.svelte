@@ -1,32 +1,21 @@
 <script lang="ts">
-	import {page} from '$app/stores';
-	import {inView} from '$lib/actions/inView';
-
-	/** Site settings from CMS (via root layout) */
-	let siteSettings = $derived($page.data.siteSettings);
-
-	/** Hero title from CMS or fallback */
-	let heroTitle = $derived(siteSettings?.heroTitle || 'Creating art');
-
-	/** Hero subtitle from CMS or fallback */
-	let heroSubtitle = $derived(
-		siteSettings?.heroSubtitle ||
-			'A collection of works exploring form, color, and emotion through various mediums. Each piece tells a story of creative exploration and artistic growth.'
-	);
+	import { inView } from '$lib/actions/inView';
 </script>
 
 <svelte:head>
-	<title>{siteSettings?.siteTitle || 'Portfolio'} | Art & Design</title>
+	<title>Portfolio | Art & Design</title>
 </svelte:head>
 
 <section class="hero">
 	<div class="hero__content">
 		<h1 class="hero__title reveal" use:inView>
-			{heroTitle}
+			Creating<br />
+			<span class="hero__title-accent">art</span>
 		</h1>
 
 		<p class="hero__subtitle reveal reveal-delay-1" use:inView>
-			{heroSubtitle}
+			A collection of works exploring form, color, and emotion through various mediums. Each piece
+			tells a story of creative exploration and artistic growth.
 		</p>
 	</div>
 

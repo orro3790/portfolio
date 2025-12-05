@@ -46,6 +46,8 @@
 	<meta name="description" content={project?.subtitle || `${project?.title} - Art project`} />
 </svelte:head>
 
+<!-- Key block forces remount when navigating between projects, resetting all animation states -->
+{#key project.slug}
 <article class="project">
 	<!-- Hero Section -->
 	<header class="project__hero">
@@ -171,6 +173,7 @@
 </article>
 
 <Footer />
+{/key}
 
 <style>
 	.project {

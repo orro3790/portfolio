@@ -2,21 +2,22 @@
 	/**
 	 * @component Footer
 	 * Site footer with project navigation and contact link.
-	 * Shows active state for current page. Uses Sanity data via page store.
+	 * Shows active state for current page.
 	 */
-	import {page} from '$app/stores';
-	import {resolve} from '$app/paths';
+	import { page } from '$app/stores';
+	import { resolve } from '$app/paths';
+	import { navItems } from '$lib/data/projects';
 
-	/** Site settings from CMS (via root layout) */
-	let siteSettings = $derived($page.data.siteSettings);
+	interface Props {
+		instagram?: string;
+	}
 
-	/** Navigation items from CMS (via root layout) */
-	let navigation = $derived($page.data.navigation || []);
+	let { instagram }: Props = $props();
 
 	const year = new Date().getFullYear();
 
-	/** Current path for active state */
-	let currentPath = $derived($page.url.pathname);
+	// Get current path for active state
+	const currentPath = $derived($page.url.pathname);
 </script>
 
 <footer class="footer">
@@ -24,10 +25,10 @@
 		<!-- Project links column -->
 		<nav class="footer__projects" aria-label="Projects">
 			<ul class="footer__project-list">
-				{#each navigation as item (item.slug)}
+				{#each navItems as item (item.slug)}
 					<li>
 						<a
-							href={resolve('/work/[slug]', {slug: item.slug})}
+							href={resolve('/work/[slug]', { slug: item.slug })}
 							class="footer__project-link"
 							class:active={currentPath === `/work/${item.slug}`}
 						>
@@ -49,14 +50,9 @@
 			</a>
 
 			<div class="footer__meta">
-				{#if siteSettings?.instagram}
+				{#if instagram}
 					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
-					<a
-						href={siteSettings.instagram}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="footer__social"
-					>
+					<a href={instagram} target="_blank" rel="noopener noreferrer" class="footer__social">
 						Instagram
 					</a>
 					<span class="footer__divider">·</span>

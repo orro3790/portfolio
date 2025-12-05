@@ -3,11 +3,11 @@
  * Uses @sanity/image-url to generate optimized CDN URLs.
  * @module lib/sanity/imageUrl
  */
-import imageUrlBuilder from '@sanity/image-url'
+import {createImageUrlBuilder} from '@sanity/image-url'
 import type {SanityImageSource} from '@sanity/image-url/lib/types/types'
 import {client} from './client'
 
-const builder = imageUrlBuilder(client)
+const builder = createImageUrlBuilder(client)
 
 /**
  * Build image URL with automatic crop/hotspot application
@@ -54,4 +54,5 @@ export function getImageSrcSet(
     .map((w) => `${urlFor(source).width(w).auto('format').url()} ${w}w`)
     .join(', ')
 }
+
 

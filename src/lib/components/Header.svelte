@@ -4,9 +4,12 @@
 
 	// Hide header on desktop for landing pages
 	let isLandingPage = $derived($page.url.pathname === '/work' || $page.url.pathname === '/');
+
+	// Hide entire header (including menu button) on contact page
+	let isContactPage = $derived($page.url.pathname === '/contact');
 </script>
 
-<header class="header" class:desktop-hidden={isLandingPage} class:menu-active={$isMenuOpen}>
+<header class="header" class:desktop-hidden={isLandingPage} class:hidden={isContactPage} class:menu-active={$isMenuOpen}>
 	<div class="header__inner">
 		<button
 			class="header__menu-btn btn"
@@ -39,6 +42,11 @@
 		z-index: calc(var(--z-modal) + 1);
 		opacity: 1;
 		pointer-events: auto;
+	}
+
+	/* Completely hide header on contact page */
+	.header.hidden {
+		display: none;
 	}
 
 	/* Hide on desktop landing page */

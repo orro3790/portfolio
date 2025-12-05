@@ -4,12 +4,15 @@
 	 * Two-column layout: portrait image with name overlay (left),
 	 * centered text block (right). Full viewport, no scrolling.
 	 */
+	import {onDestroy} from 'svelte';
 	import {page} from '$app/stores';
 	import {inview} from '$lib/actions/inView';
 	import {getImageUrl} from '$lib/sanity/imageUrl';
 
 	let imageVisible = $state(false);
 	let textVisible = $state(false);
+	let copyStatus = $state<'idle' | 'copied' | 'error'>('idle');
+	let copyTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	/** Site settings from CMS (via root layout) */
 	let siteSettings = $derived($page.data.siteSettings);
@@ -32,6 +35,45 @@ Each piece is an invitation to pause, reflect, and discover something new within
 
 	/** Split bio into paragraphs */
 	let paragraphs = $derived(artist.bio.split('\n\n').filter((p: string) => p.trim()));
+
+	/**
+	 * Copy the artist email to the clipboard and provide inline feedback.
+	 * Falls back to mailto navigation if clipboard access is unavailable.
+	 */
+	async function handleCopyEmail() {
+		if (!artist.email) return;
+
+		if (copyTimeout) {
+			clearTimeout(copyTimeout);
+			copyTimeout = null;
+		}
+
+		try {
+			if (!navigator?.clipboard?.writeText) {
+				throw new Error('Clipboard API unavailable');
+			}
+
+			await navigator.clipboard.writeText(artist.email);
+			copyStatus = 'copied';
+		} catch (error) {
+			console.error('Failed to copy email', error);
+			copyStatus = 'error';
+			// Provide a graceful fallback so the button still opens mail client
+			window.location.href = `mailto:${artist.email}`;
+		} finally {
+			copyTimeout = setTimeout(() => {
+				copyStatus = 'idle';
+				copyTimeout = null;
+			}, 2000);
+		}
+	}
+
+	onDestroy(() => {
+		if (copyTimeout) {
+			clearTimeout(copyTimeout);
+			copyTimeout = null;
+		}
+	});
 </script>
 
 <svelte:head>
@@ -72,7 +114,41 @@ Each piece is an invitation to pause, reflect, and discover something new within
 						<p style="--delay: {i * 100}ms">{paragraph}</p>
 					{/each}
 				</div>
-				<a href="mailto:{artist.email}" class="contact__email">{artist.email}</a>
+				<button
+					type="button"
+					class="contact__email"
+					on:click={handleCopyEmail}
+					aria-label={`Copy ${artist.email} to clipboard`}
+				>
+					<span class="contact__email-text">{artist.email}</span>
+					<span class="contact__email-status" aria-live="polite">
+						{#if copyStatus === 'copied'}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="20"
+								height="20"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="contact__email-icon"
+								aria-hidden="true"
+							>
+								<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+								<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+								<path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+								<path d="M9 14l2 2l4 -4" />
+							</svg>
+							<span>Copied</span>
+						{:else if copyStatus === 'error'}
+							<span>Tap to retry</span>
+						{:else}
+							<span>Copy</span>
+						{/if}
+					</span>
+				</button>
 			</div>
 		</div>
 	</div>
@@ -225,24 +301,49 @@ Each piece is an invitation to pause, reflect, and discover something new within
 	}
 
 	.contact__email {
-		display: inline-block;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-3);
 		font-family: var(--font-body);
 		font-size: var(--text-sm);
 		color: var(--color-text);
-		text-decoration: none;
+		background: transparent;
 		padding: var(--space-2) var(--space-4);
 		border: 1px solid var(--color-border);
 		border-radius: 100px;
+		cursor: pointer;
 		transition:
 			background-color 0.2s ease,
 			border-color 0.2s ease,
-			color 0.2s ease;
+			color 0.2s ease,
+			box-shadow 0.2s ease;
 	}
 
-	.contact__email:hover {
+	.contact__email:hover,
+	.contact__email:focus-visible {
 		background-color: var(--color-text);
 		border-color: var(--color-text);
 		color: var(--color-bg);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+		outline: none;
+	}
+
+	.contact__email-text {
+		font-weight: 600;
+	}
+
+	.contact__email-status {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	.contact__email-icon {
+		width: 1.1rem;
+		height: 1.1rem;
 	}
 
 	/* Mobile adjustments */

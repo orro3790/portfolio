@@ -31,3 +31,4 @@ export const GET: RequestHandler = async ({url, cookies}) => {
   redirect(307, slug ? `/work/${slug}` : '/')
 }
 
+
