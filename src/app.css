@@ -423,34 +423,15 @@ video {
 	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Hero image crossfade - control how old/new states blend
-   Keep old visible longer before fading, new fades in after delay */
-::view-transition-old(project-hero) {
-	animation: hero-fade-out 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
+/* Hero image - no crossfade, just geometry morph (position + size) */
+::view-transition-old(project-hero),
 ::view-transition-new(project-hero) {
-	animation: hero-fade-in 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	/* Disable default crossfade - both stay fully visible during the morph */
+	animation: none;
+	mix-blend-mode: normal;
 }
 
-@keyframes hero-fade-out {
-	0%,
-	30% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0;
-	}
-}
-
-@keyframes hero-fade-in {
-	0% {
-		opacity: 0;
-	}
-	30% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
+/* Hide the old snapshot immediately so only the new image is visible during morph */
+::view-transition-old(project-hero) {
+	display: none;
 }

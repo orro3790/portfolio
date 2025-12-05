@@ -4,7 +4,6 @@
 	 * Two-column layout: portrait image with name overlay (left),
 	 * centered text block (right). Full viewport, no scrolling.
 	 */
-	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { inview } from '$lib/actions/inView';
 	import { getImageUrl } from '$lib/sanity/imageUrl';
@@ -68,11 +67,13 @@ Each piece is an invitation to pause, reflect, and discover something new within
 		}
 	}
 
-	onDestroy(() => {
-		if (copyTimeout) {
-			clearTimeout(copyTimeout);
-			copyTimeout = null;
-		}
+	// Cleanup timeout on component destroy (Svelte 5 idiomatic pattern)
+	$effect(() => {
+		return () => {
+			if (copyTimeout) {
+				clearTimeout(copyTimeout);
+			}
+		};
 	});
 </script>
 
@@ -90,13 +91,11 @@ Each piece is an invitation to pause, reflect, and discover something new within
 			use:inview={{ threshold: 0.2 }}
 			oninview={() => (imageVisible = true)}
 		>
-			<div class="contact__image-wrapper">
-				<img src={artist.portrait} alt={artist.name} class="contact__image" />
-				<!-- Name overlay at bottom left -->
-				<div class="contact__image-info">
-					<h1 class="contact__name">{artist.name}</h1>
-					<span class="contact__subtitle">{artist.subtitle}</span>
-				</div>
+			<img src={artist.portrait} alt={artist.name} class="contact__image" />
+			<!-- Name overlay at bottom left -->
+			<div class="contact__image-info">
+				<h1 class="contact__name">{artist.name}</h1>
+				<span class="contact__subtitle">{artist.subtitle}</span>
 			</div>
 		</div>
 
@@ -118,39 +117,42 @@ Each piece is an invitation to pause, reflect, and discover something new within
 					type="button"
 					class="contact__email"
 					onclick={handleCopyEmail}
+					aria-live="polite"
 					aria-label={`Copy ${artist.email} to clipboard`}
 				>
-					<span class="contact__email-text">{artist.email}</span>
-					<span class="contact__email-status" aria-live="polite">
-						{#if copyStatus === 'copied'}
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="20"
-								height="20"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="contact__email-icon"
-								aria-hidden="true"
-							>
-								<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-								<path
-									d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"
-								/>
-								<path
-									d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"
-								/>
-								<path d="M9 14l2 2l4 -4" />
-							</svg>
-							<span>Copied</span>
-						{:else if copyStatus === 'error'}
-							<span>Tap to retry</span>
-						{:else}
-							<span>Copy</span>
-						{/if}
+					<span
+						class="contact__email-layer contact__email-layer--default"
+						data-visible={copyStatus === 'idle' || copyStatus === 'error'}
+					>
+						{copyStatus === 'error' ? 'Tap to retry' : artist.email}
+					</span>
+					<span
+						class="contact__email-layer contact__email-layer--copied"
+						data-visible={copyStatus === 'copied'}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="contact__email-icon"
+							aria-hidden="true"
+						>
+							<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+							<path
+								d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"
+							/>
+							<path
+								d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"
+							/>
+							<path d="M9 14l2 2l4 -4" />
+						</svg>
+						<span>Copied</span>
 					</span>
 				</button>
 			</div>
@@ -197,12 +199,9 @@ Each piece is an invitation to pause, reflect, and discover something new within
 		transform: translateX(0);
 	}
 
-	.contact__image-wrapper {
+	.contact__image {
 		position: absolute;
 		inset: 0;
-	}
-
-	.contact__image {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -305,22 +304,26 @@ Each piece is an invitation to pause, reflect, and discover something new within
 	}
 
 	.contact__email {
+		position: relative;
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-3);
+		justify-content: center;
+		min-width: 220px;
+		height: 44px;
+		overflow: hidden;
 		font-family: var(--font-body);
 		font-size: var(--text-sm);
 		color: var(--color-text);
 		background: transparent;
-		padding: var(--space-2) var(--space-4);
+		padding: 0 var(--space-5);
 		border: 1px solid var(--color-border);
-		border-radius: 100px;
+		border-radius: 999px;
 		cursor: pointer;
 		transition:
-			background-color 0.2s ease,
-			border-color 0.2s ease,
-			color 0.2s ease,
-			box-shadow 0.2s ease;
+			background-color 0.25s ease,
+			border-color 0.25s ease,
+			color 0.25s ease,
+			box-shadow 0.25s ease;
 	}
 
 	.contact__email:hover,
@@ -328,21 +331,36 @@ Each piece is an invitation to pause, reflect, and discover something new within
 		background-color: var(--color-text);
 		border-color: var(--color-text);
 		color: var(--color-bg);
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 		outline: none;
 	}
 
-	.contact__email-text {
-		font-weight: 600;
-	}
-
-	.contact__email-status {
+	.contact__email-layer {
+		position: absolute;
+		inset: 0;
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		gap: var(--space-2);
-		font-weight: 600;
+		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
+		opacity: 0;
+		transform: translateY(10px);
+		transition:
+			opacity 180ms ease,
+			transform 180ms ease;
+	}
+
+	.contact__email-layer[data-visible='true'] {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.contact__email-layer--default {
+		font-weight: 600;
+		text-transform: none;
+		letter-spacing: normal;
 	}
 
 	.contact__email-icon {

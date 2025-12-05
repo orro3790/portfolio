@@ -5,8 +5,8 @@
 	 * Shows active state for current page.
 	 */
 	import { page } from '$app/state';
-import { resolve } from '$app/paths';
-import type { NavItemWithPreview } from '$lib/schemas/project';
+	import { resolve } from '$app/paths';
+	import type { NavItemWithPreview } from '$lib/schemas/project';
 
 	interface Props {
 		instagram?: string;
@@ -16,7 +16,7 @@ import type { NavItemWithPreview } from '$lib/schemas/project';
 
 	const year = new Date().getFullYear();
 
-	// Get current path for active state
+	// Get current path for active state (page from $app/state is reactive object, not a function)
 	const currentPath = $derived(page.url.pathname);
 
 	// Navigation from root layout (Sanity-backed)

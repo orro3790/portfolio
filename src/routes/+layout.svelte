@@ -10,6 +10,7 @@
 	import { onMount } from 'svelte';
 	import Lenis from 'lenis';
 	import { lenisStore } from '$lib/stores/lenis';
+	import { isProjectToProjectNav } from '$lib/stores/ui';
 
 	let { children } = $props();
 	let navigation = $derived($page.data.navigation || []);
@@ -48,15 +49,29 @@
 		};
 	});
 
-	// Reset scroll position on navigation
+	// Reset scroll position and navigation state after navigation completes
 	afterNavigate(() => {
 		lenis?.scrollTo(0, { immediate: true });
+		// Reset the project-to-project flag so future navigations work correctly
+		isProjectToProjectNav.set(false);
 	});
 
 	// Enable View Transitions API for smooth page transitions
-	onNavigate((navigation) => {
-		// Only use view transitions for project pages
+	onNavigate(async (navigation) => {
 		if (!document.startViewTransition) return;
+
+		// Detect project-to-project navigation to disable hero view transition
+		// This prevents the old project's hero from appearing during the transition
+		const fromProject = navigation.from?.route.id === '/work/[slug]';
+		const toProject = navigation.to?.route.id === '/work/[slug]';
+		const isP2P = fromProject && toProject;
+
+		// Set flag BEFORE view transition captures DOM snapshot
+		isProjectToProjectNav.set(isP2P);
+
+		// Wait for Svelte to update the DOM with the new store value
+		// This ensures the old project's hero loses its view-transition-name
+		await new Promise((r) => requestAnimationFrame(r));
 
 		return new Promise((resolve) => {
 			document.startViewTransition(async () => {

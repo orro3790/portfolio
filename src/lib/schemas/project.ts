@@ -62,6 +62,7 @@ export const sectionSchema = z.object({
 	// Animation options
 	revealFrom: z.enum(['left', 'right', 'bottom']).optional(),
 	// Grid options
+	columns: z.enum(['2', '3', '4']).optional(),
 	gap: z.enum(['none', 'small', 'medium', 'large']).optional(),
 	aspectRatio: z.string().optional(),
 	// Carousel options
