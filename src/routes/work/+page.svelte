@@ -1,7 +1,14 @@
 <script lang="ts">
-	import { inView } from '$lib/actions/inView';
+	import {inView} from '$lib/actions/inView';
+	import {resolve} from '$app/paths';
 	import Footer from '$lib/components/Footer.svelte';
-	import { projects } from '$lib/data/projects';
+	import PreviewBanner from '$lib/components/PreviewBanner.svelte';
+	import {getImageUrl} from '$lib/sanity/imageUrl';
+
+	export let data;
+
+	$: projects = data.projects;
+	$: isPreview = data.isPreview;
 </script>
 
 <svelte:head>
@@ -26,11 +33,11 @@
 				style="--delay: {index * 100}ms"
 				use:inView
 			>
-				<a href="/work/{project.slug}" class="work__item-link">
+				<a href={resolve(`/work/${project.slug}`)} class="work__item-link">
 					<div class="work__item-image">
 						<img
-							src={project.heroImage}
-							alt={project.title}
+							src={getImageUrl(project.previewImage, {width: 800})}
+							alt={project.previewImage?.alt || project.title}
 							loading="lazy"
 						/>
 						<div class="work__item-placeholder" aria-hidden="true">
@@ -39,13 +46,17 @@
 					</div>
 					<div class="work__item-info">
 						<h2 class="work__item-title">{project.title}</h2>
-						<p class="work__item-type">{project.meta.projectType}</p>
+						<p class="work__item-type">{project.projectType}</p>
 					</div>
 				</a>
 			</article>
 		{/each}
 	</div>
 </section>
+
+{#if isPreview}
+	<PreviewBanner />
+{/if}
 
 <Footer />
 

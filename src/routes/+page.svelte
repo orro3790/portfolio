@@ -1,22 +1,32 @@
 <script lang="ts">
-	import { inView } from '$lib/actions/inView';
-	import Footer from '$lib/components/Footer.svelte';
+	import {page} from '$app/stores';
+	import {inView} from '$lib/actions/inView';
+
+	/** Site settings from CMS (via root layout) */
+	let siteSettings = $derived($page.data.siteSettings);
+
+	/** Hero title from CMS or fallback */
+	let heroTitle = $derived(siteSettings?.heroTitle || 'Creating art');
+
+	/** Hero subtitle from CMS or fallback */
+	let heroSubtitle = $derived(
+		siteSettings?.heroSubtitle ||
+			'A collection of works exploring form, color, and emotion through various mediums. Each piece tells a story of creative exploration and artistic growth.'
+	);
 </script>
 
 <svelte:head>
-	<title>Portfolio | Art & Design</title>
+	<title>{siteSettings?.siteTitle || 'Portfolio'} | Art & Design</title>
 </svelte:head>
 
 <section class="hero">
 	<div class="hero__content">
 		<h1 class="hero__title reveal" use:inView>
-			Creating<br />
-			<span class="hero__title-accent">art</span>
+			{heroTitle}
 		</h1>
 
 		<p class="hero__subtitle reveal reveal-delay-1" use:inView>
-			A collection of works exploring form, color, and emotion through various mediums. Each piece
-			tells a story of creative exploration and artistic growth.
+			{heroSubtitle}
 		</p>
 	</div>
 
@@ -26,16 +36,16 @@
 	</div>
 </section>
 
-<Footer />
-
 <style>
 	.hero {
 		position: relative;
-		min-height: calc(100vh - var(--header-height));
+		min-height: 100vh;
 		display: flex;
 		align-items: center;
 		padding: var(--space-16) var(--space-6);
 		overflow: hidden;
+		/* Negate the main padding-top since header isn't visible on landing */
+		margin-top: calc(-1 * var(--header-height));
 	}
 
 	.hero__content {

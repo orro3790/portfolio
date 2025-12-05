@@ -47,7 +47,7 @@
 			<span class="t-grid__eyebrow">{eyebrow}</span>
 		{/if}
 		<h2 class="t-grid__heading">
-			{#each lines as line, i}
+			{#each lines as line, i (i)}
 				<span class="t-grid__line" style="--delay: {i * 100}ms">
 					<span class="t-grid__line-inner">{line}</span>
 				</span>

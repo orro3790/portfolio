@@ -103,6 +103,28 @@ body {
 	overflow-x: hidden;
 }
 
+/* Disable text selection on presentational elements */
+body {
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+/* Re-enable selection for interactive/editable elements */
+input,
+textarea,
+[contenteditable='true'],
+pre,
+code {
+	user-select: text;
+	-webkit-user-select: text;
+}
+
+/* Disable image dragging */
+img {
+	-webkit-user-drag: none;
+	user-drag: none;
+}
+
 /* --------------------------------------------------------------------------
    3. Typography
    -------------------------------------------------------------------------- */
@@ -391,20 +413,46 @@ video {
 /* Root transition - fade for page content */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-	animation-duration: 0.6s;
-	animation-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+	animation-duration: 0.8s;
+	animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Project hero image transition - expansion handled by browser morph */
-::view-transition-group(project-hero-layers),
-::view-transition-group(project-hero-ethereal-forms),
-::view-transition-group(project-hero-urban-fragments),
-::view-transition-group(project-hero-light-studies),
-::view-transition-group(project-hero-ceramic-vessels),
-::view-transition-group(project-hero-abstract-narratives),
-::view-transition-group(project-hero-nature-impressions) {
-	animation-duration: 1.2s;
-	animation-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+/* Project hero image transition - the geometry morph (position + size) */
+::view-transition-group(project-hero) {
+	animation-duration: 1.6s;
+	/* Custom easing: gentle start, smooth middle, soft landing */
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Hero image crossfade - control how old/new states blend
+   Keep old visible longer before fading, new fades in after delay */
+::view-transition-old(project-hero) {
+	animation: hero-fade-out 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+::view-transition-new(project-hero) {
+	animation: hero-fade-in 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes hero-fade-out {
+	0%, 30% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes hero-fade-in {
+	0% {
+		opacity: 0;
+	}
+	30% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
 }
 
 

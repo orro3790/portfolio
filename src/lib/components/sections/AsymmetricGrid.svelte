@@ -3,11 +3,13 @@
 	 * AsymmetricGrid Section — Unified asymmetric 2-column layout.
 	 *
 	 * Semantic props:
-	 * - largePosition: Where the spanning image sits ('left' or 'right')
-	 * - smallPosition: Where the smaller image sits ('top' or 'bottom')
+	 * - largePosition: Where the spanning media sits ('left' or 'right')
+	 * - smallPosition: Where the smaller media sits ('top' or 'bottom')
 	 *
 	 * This creates 4 natural layout combinations that Sanity can expose as
 	 * simple dropdown choices for content editors.
+	 *
+	 * Supports both images and videos via the Media type.
 	 *
 	 * Layout ASCII examples:
 	 *
@@ -26,27 +28,23 @@
 	 * ╚═══════╩═══════════╝
 	 */
 	import { inview } from '$lib/actions/inView';
-
-	interface ImageData {
-		src: string;
-		alt: string;
-		caption?: string;
-	}
+	import MediaItem from '$lib/components/primitives/MediaItem.svelte';
+	import type { Media } from '$lib/schemas/project';
 
 	interface Props {
-		/** Position of large image (spans 2 rows) */
+		/** Position of large media (spans 2 rows) */
 		largePosition: 'left' | 'right';
-		/** Position of small image within the non-spanning column */
+		/** Position of small media within the non-spanning column */
 		smallPosition: 'top' | 'bottom';
-		/** Large image data */
-		imageLarge: ImageData;
-		/** Small image data */
-		imageSmall: ImageData;
+		/** Large media item */
+		mediaLarge: Media;
+		/** Small media item */
+		mediaSmall: Media;
 		/** Optional text content for the empty cell */
 		textContent?: string;
 	}
 
-	let { largePosition, smallPosition, imageLarge, imageSmall, textContent }: Props = $props();
+	let { largePosition, smallPosition, mediaLarge, mediaSmall, textContent }: Props = $props();
 
 	let visible = $state(false);
 
@@ -79,25 +77,25 @@
 	style="--grid-areas: {gridAreas}; --grid-columns: {gridColumns};"
 >
 	<div class="asym-grid__layout">
-		<!-- Large image cell (spans 2 rows) -->
+		<!-- Large media cell (spans 2 rows) -->
 		<div class="asym-grid__cell asym-grid__cell--large">
-			<div class="asym-grid__image-wrapper asym-grid__image-wrapper--large">
+			<div class="asym-grid__media-wrapper asym-grid__media-wrapper--large">
 				<div class="asym-grid__curtain"></div>
-				<img src={imageLarge.src} alt={imageLarge.alt} loading="lazy" />
+				<MediaItem media={mediaLarge} class="asym-grid__media" loading="lazy" />
 			</div>
-			{#if imageLarge.caption}
-				<p class="asym-grid__caption">{imageLarge.caption}</p>
+			{#if mediaLarge.caption}
+				<p class="asym-grid__caption">{mediaLarge.caption}</p>
 			{/if}
 		</div>
 
-		<!-- Small image cell -->
+		<!-- Small media cell -->
 		<div class="asym-grid__cell asym-grid__cell--small">
-			<div class="asym-grid__image-wrapper asym-grid__image-wrapper--small">
+			<div class="asym-grid__media-wrapper asym-grid__media-wrapper--small">
 				<div class="asym-grid__curtain"></div>
-				<img src={imageSmall.src} alt={imageSmall.alt} loading="lazy" />
+				<MediaItem media={mediaSmall} class="asym-grid__media" loading="lazy" />
 			</div>
-			{#if imageSmall.caption}
-				<p class="asym-grid__caption">{imageSmall.caption}</p>
+			{#if mediaSmall.caption}
+				<p class="asym-grid__caption">{mediaSmall.caption}</p>
 			{/if}
 		</div>
 
@@ -142,7 +140,7 @@
 	}
 
 	/* 
-	 * Small image alignment based on position:
+	 * Small media alignment based on position:
 	 * - If small is at TOP, align content to START (top of cell)
 	 * - If small is at BOTTOM, align content to END (bottom of cell)
 	 */
@@ -163,8 +161,8 @@
 		justify-content: flex-start;
 	}
 
-	/* Image wrappers */
-	.asym-grid__image-wrapper {
+	/* Media wrappers */
+	.asym-grid__media-wrapper {
 		position: relative;
 		overflow: hidden;
 		background-color: var(--color-bg-elevated);
@@ -172,17 +170,17 @@
 		width: 100%;
 	}
 
-	/* Large image: landscape ratio matching Metalab reference (~3:2) */
-	.asym-grid__image-wrapper--large {
+	/* Large media: landscape ratio matching Metalab reference (~3:2) */
+	.asym-grid__media-wrapper--large {
 		aspect-ratio: 3 / 2;
 	}
 
-	/* Small image: slightly wider landscape (~16:9) */
-	.asym-grid__image-wrapper--small {
+	/* Small media: slightly wider landscape (~16:9) */
+	.asym-grid__media-wrapper--small {
 		aspect-ratio: 16 / 9;
 	}
 
-	.asym-grid__image-wrapper img {
+	.asym-grid__media-wrapper :global(.asym-grid__media) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -191,7 +189,7 @@
 		transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.asym-grid.visible .asym-grid__image-wrapper img {
+	.asym-grid.visible .asym-grid__media-wrapper :global(.asym-grid__media) {
 		transform: scale(1);
 	}
 
@@ -214,7 +212,7 @@
 		transform-origin: bottom;
 	}
 
-	/* Stagger the small image reveal */
+	/* Stagger the small media reveal */
 	.asym-grid__cell--small .asym-grid__curtain {
 		transition-delay: 150ms;
 	}

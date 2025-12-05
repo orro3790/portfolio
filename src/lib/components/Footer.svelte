@@ -1,80 +1,180 @@
 <script lang="ts">
 	/**
-	 * Minimalist site footer with contact links and copyright.
+	 * @component Footer
+	 * Site footer with project navigation and contact link.
+	 * Shows active state for current page. Uses Sanity data via page store.
 	 */
-	interface Props {
-		email?: string;
-		instagram?: string;
-	}
+	import {page} from '$app/stores';
+	import {resolve} from '$app/paths';
 
-	let { email = 'jua1209@naver.com', instagram }: Props = $props();
+	/** Site settings from CMS (via root layout) */
+	let siteSettings = $derived($page.data.siteSettings);
+
+	/** Navigation items from CMS (via root layout) */
+	let navigation = $derived($page.data.navigation || []);
 
 	const year = new Date().getFullYear();
+
+	/** Current path for active state */
+	let currentPath = $derived($page.url.pathname);
 </script>
 
 <footer class="footer">
 	<div class="footer__content">
-		<a href="mailto:{email}" class="footer__email">{email}</a>
-
-		<nav class="footer__links">
-			{#if instagram}
-				<a href={instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
-				<span class="footer__divider">·</span>
-			{/if}
-			<span class="footer__copyright">© {year}</span>
+		<!-- Project links column -->
+		<nav class="footer__projects" aria-label="Projects">
+			<ul class="footer__project-list">
+				{#each navigation as item (item.slug)}
+					<li>
+						<a
+							href={resolve('/work/[slug]', {slug: item.slug})}
+							class="footer__project-link"
+							class:active={currentPath === `/work/${item.slug}`}
+						>
+							{item.title}
+						</a>
+					</li>
+				{/each}
+			</ul>
 		</nav>
+
+		<!-- Right column: Contact + meta -->
+		<div class="footer__right">
+			<a
+				href={resolve('/contact')}
+				class="footer__contact-link"
+				class:active={currentPath === '/contact'}
+			>
+				Contact
+			</a>
+
+			<div class="footer__meta">
+				{#if siteSettings?.instagram}
+					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
+					<a
+						href={siteSettings.instagram}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="footer__social"
+					>
+						Instagram
+					</a>
+					<span class="footer__divider">·</span>
+				{/if}
+				<span class="footer__copyright">© {year}</span>
+			</div>
+		</div>
 	</div>
 </footer>
 
 <style>
 	.footer {
-		padding: var(--space-12) var(--gutter);
+		padding: var(--space-16) var(--gutter);
+		border-top: 1px solid var(--color-border);
+		margin-top: var(--space-24);
 	}
 
 	.footer__content {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-4);
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: var(--space-8);
 		max-width: var(--max-width);
 		margin: 0 auto;
 	}
 
-	@media (min-width: 640px) {
+	@media (min-width: 768px) {
 		.footer__content {
-			flex-direction: row;
-			justify-content: space-between;
-			align-items: center;
+			grid-template-columns: 1fr auto;
+			align-items: start;
 		}
 	}
 
-	.footer__email {
+	/* Project links */
+	.footer__projects {
+		order: 2;
+	}
+
+	@media (min-width: 768px) {
+		.footer__projects {
+			order: 1;
+		}
+	}
+
+	.footer__project-list {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.footer__project-link {
 		font-family: var(--font-body);
 		font-size: var(--text-sm);
+		color: var(--color-text-muted);
+		text-decoration: none;
+		transition: color 0.2s ease;
+		display: inline-block;
+	}
+
+	.footer__project-link:hover {
+		color: var(--color-text);
+	}
+
+	.footer__project-link.active {
+		color: var(--color-text);
+		font-weight: 500;
+	}
+
+	/* Right column */
+	.footer__right {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-6);
+		order: 1;
+	}
+
+	@media (min-width: 768px) {
+		.footer__right {
+			order: 2;
+			align-items: flex-end;
+			text-align: right;
+		}
+	}
+
+	.footer__contact-link {
+		font-family: var(--font-display);
+		font-size: var(--text-2xl);
+		font-weight: 400;
 		color: var(--color-text);
 		text-decoration: none;
 		transition: opacity 0.2s ease;
 	}
 
-	.footer__email:hover {
+	.footer__contact-link:hover {
 		opacity: 0.6;
 	}
 
-	.footer__links {
+	.footer__contact-link.active {
+		text-decoration: underline;
+		text-underline-offset: 4px;
+	}
+
+	.footer__meta {
 		display: flex;
 		align-items: center;
 		gap: var(--space-3);
 		font-family: var(--font-body);
-		font-size: var(--text-sm);
+		font-size: var(--text-xs);
 		color: var(--color-text-muted);
 	}
 
-	.footer__links a {
+	.footer__social {
 		color: var(--color-text-muted);
 		text-decoration: none;
 		transition: color 0.2s ease;
 	}
 
-	.footer__links a:hover {
+	.footer__social:hover {
 		color: var(--color-text);
 	}
 

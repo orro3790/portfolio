@@ -4,17 +4,18 @@
 	 * Horizontal scroll carousel with drag/swipe interaction and peek effect.
 	 *
 	 * Features:
-	 * - Center-focused layout with adjacent images partially visible
+	 * - Center-focused layout with adjacent items partially visible
 	 * - Mouse drag and touch swipe support
 	 * - Smooth eased scrolling (Lenis-style expo easing)
 	 * - Curtain reveal animation with staggered timing
+	 * - Supports both images and videos
 	 *
 	 * @example
 	 * ```svelte
 	 * <Carousel
-	 *   images={[
-	 *     { src: '/image1.jpg', alt: 'First image', caption: 'Optional caption' },
-	 *     { src: '/image2.jpg', alt: 'Second image' }
+	 *   media={[
+	 *     { type: 'image', src: '/image1.jpg', alt: 'First image', caption: 'Optional caption' },
+	 *     { type: 'video', src: '/clip.mp4', alt: 'Video clip' }
 	 *   ]}
 	 *   initialIndex={1}
 	 *   aspectRatio="4/3"
@@ -22,23 +23,19 @@
 	 * ```
 	 */
 	import { inview } from '$lib/actions/inView';
-
-	interface CarouselImage {
-		src: string;
-		alt: string;
-		caption?: string;
-	}
+	import MediaItem from '$lib/components/primitives/MediaItem.svelte';
+	import type { Media } from '$lib/schemas/project';
 
 	interface Props {
-		/** Array of images to display in the carousel */
-		images: CarouselImage[];
-		/** CSS aspect ratio for images (default: '3/4' for portrait-style) */
+		/** Array of media items to display in the carousel */
+		media: Media[];
+		/** CSS aspect ratio for items (default: '3/4' for portrait-style) */
 		aspectRatio?: string;
 		/** Initial slide index to center on (0-based, default: 2) */
 		initialIndex?: number;
 	}
 
-	let { images, aspectRatio = '3/4', initialIndex = 2 }: Props = $props();
+	let { media, aspectRatio = '3/4', initialIndex = 2 }: Props = $props();
 
 	let visible = $state(false);
 	let scrollContainer: HTMLDivElement | undefined = $state();
@@ -47,7 +44,7 @@
 
 	/** Returns validated initial index within bounds */
 	function getInitialIndex(): number {
-		return Math.max(0, Math.min(initialIndex, images.length - 1));
+		return Math.max(0, Math.min(initialIndex, media.length - 1));
 	}
 
 	// Drag state
@@ -223,7 +220,7 @@
 		scrollToIndex(findClosestIndex(), true);
 	}
 
-	// Center initial image once visible and container is ready
+	// Center initial item once visible and container is ready
 	$effect(() => {
 		if (visible && scrollContainer) {
 			// Use RAF to ensure layout is computed before positioning
@@ -248,7 +245,7 @@
 	class:visible
 	use:inview={{ threshold: 0.1 }}
 	oninview={() => (visible = true)}
-	aria-label="Image gallery"
+	aria-label="Media gallery"
 >
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
@@ -264,26 +261,26 @@
 		ontouchmove={handleTouchMove}
 		ontouchend={handleTouchEnd}
 		role="group"
-		aria-label="Image carousel - drag to scroll"
+		aria-label="Media carousel - drag to scroll"
 		aria-roledescription="carousel"
 	>
-		{#each images as image, i (image.src)}
+		{#each media as item, i (item.src)}
 			<div
 				class="carousel__item"
 				class:active={activeIndex === i}
 				style="--aspect-ratio: {aspectRatio}; --curtain-delay: {i * 120}ms"
 			>
-				<div class="carousel__image-wrapper">
+				<div class="carousel__media-wrapper">
 					<!-- Curtain reveal overlay -->
 					<div class="carousel__curtain" aria-hidden="true"></div>
-					<img src={image.src} alt={image.alt} loading="lazy" draggable="false" />
-					<!-- Placeholder for missing images -->
+					<MediaItem media={item} class="carousel__media" loading="lazy" draggable={false} />
+					<!-- Placeholder for missing media -->
 					<div class="carousel__placeholder" aria-hidden="true">
 						<span>{i + 1}</span>
 					</div>
 				</div>
-				{#if image.caption}
-					<p class="carousel__caption">{image.caption}</p>
+				{#if item.caption}
+					<p class="carousel__caption">{item.caption}</p>
 				{/if}
 			</div>
 		{/each}
@@ -344,7 +341,7 @@
 		opacity: 1;
 	}
 
-	.carousel__image-wrapper {
+	.carousel__media-wrapper {
 		position: relative;
 		aspect-ratio: var(--aspect-ratio, 3/4);
 		overflow: hidden;
@@ -354,11 +351,11 @@
 	}
 
 	/* Slight scale on active item */
-	.carousel__item.active .carousel__image-wrapper {
+	.carousel__item.active .carousel__media-wrapper {
 		transform: scale(1.02);
 	}
 
-	.carousel__image-wrapper img {
+	.carousel__media-wrapper :global(.carousel__media) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -371,7 +368,7 @@
 	}
 
 	/* Subtle zoom-out as curtain reveals */
-	.carousel.visible .carousel__image-wrapper img {
+	.carousel.visible .carousel__media-wrapper :global(.carousel__media) {
 		transform: scale(1);
 	}
 
@@ -393,7 +390,7 @@
 		transform-origin: bottom;
 	}
 
-	/* Placeholder for missing images */
+	/* Placeholder for missing media */
 	.carousel__placeholder {
 		position: absolute;
 		inset: 0;
@@ -411,8 +408,9 @@
 		opacity: 0.3;
 	}
 
-	/* Hide placeholder when image loads */
-	.carousel__image-wrapper img:not([src='']):not([src*='placeholder']) ~ .carousel__placeholder {
+	/* Hide placeholder when media loads - handled via sibling selector */
+	.carousel__media-wrapper:has(:global(.carousel__media[src]:not([src=''])))
+		.carousel__placeholder {
 		display: none;
 	}
 

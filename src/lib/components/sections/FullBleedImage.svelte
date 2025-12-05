@@ -1,16 +1,16 @@
 <script lang="ts">
 	/**
 	 * FullBleedImage Section
-	 * Edge-to-edge image with curtain reveal animation on scroll.
+	 * Edge-to-edge media (image or video) with curtain reveal animation on scroll.
 	 */
 	import { inview } from '$lib/actions/inView';
+	import MediaItem from '$lib/components/primitives/MediaItem.svelte';
+	import type { Media } from '$lib/schemas/project';
 
 	interface Props {
-		/** Image source URL */
-		src: string;
-		/** Alt text for accessibility */
-		alt: string;
-		/** Optional caption below image */
+		/** Media object (image or video) */
+		media: Media;
+		/** Optional caption below media */
 		caption?: string;
 		/** Aspect ratio (e.g., '16/9', '4/3', 'auto') */
 		aspectRatio?: string;
@@ -18,10 +18,9 @@
 		revealFrom?: 'left' | 'right' | 'bottom';
 	}
 
-	let { src, alt, caption, aspectRatio = '16/9', revealFrom = 'bottom' }: Props = $props();
+	let { media, caption, aspectRatio = '16/9', revealFrom = 'bottom' }: Props = $props();
 
 	let visible = $state(false);
-
 </script>
 
 <section
@@ -34,7 +33,7 @@
 	oninview={() => (visible = true)}
 >
 	<div class="full-bleed__wrapper" style="--aspect-ratio: {aspectRatio}">
-		<img {src} {alt} class="full-bleed__image" loading="lazy" />
+		<MediaItem {media} class="full-bleed__media" loading="lazy" />
 	</div>
 	{#if caption}
 		<p class="full-bleed__caption">{caption}</p>
@@ -76,7 +75,7 @@
 		clip-path: inset(0 0 0 0);
 	}
 
-	.full-bleed__image {
+	.full-bleed :global(.full-bleed__media) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -86,7 +85,7 @@
 		transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.full-bleed.visible .full-bleed__image {
+	.full-bleed.visible :global(.full-bleed__media) {
 		transform: scale(1);
 	}
 
@@ -110,4 +109,3 @@
 		transform: translateY(0);
 	}
 </style>
-

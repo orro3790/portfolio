@@ -1,13 +1,15 @@
 <script lang="ts">
 	/**
-	 * Diagonal Section — Staggered diagonal image arrangement using flex rows.
+	 * Diagonal Section — Staggered diagonal media arrangement using flex rows.
+	 *
+	 * Supports both images and videos via the Media type.
 	 *
 	 * Layout (like Metalab's TextAnd2Images):
 	 * ┌────────────────────────────────────────┐
-	 * │ ┌─────────────────────┐                │  ← Row 1: Large image, flex-start
+	 * │ ┌─────────────────────┐                │  ← Row 1: Large media, flex-start
 	 * │ │      LARGE          │                │
 	 * │ └─────────────────────┘                │
-	 * │                ┌─────────────┐         │  ← Row 2: Small image, flex-end
+	 * │                ┌─────────────┐         │  ← Row 2: Small media, flex-end
 	 * │                │    SMALL    │         │     (overlaps via negative margin)
 	 * │                └─────────────┘         │
 	 * └────────────────────────────────────────┘
@@ -15,23 +17,19 @@
 	 * Flex rows give more control over stagger positioning than CSS grid.
 	 */
 	import { inview } from '$lib/actions/inView';
-
-	interface ImageData {
-		src: string;
-		alt: string;
-		caption?: string;
-	}
+	import MediaItem from '$lib/components/primitives/MediaItem.svelte';
+	import type { Media } from '$lib/schemas/project';
 
 	interface Props {
-		/** Large image (top-left) */
-		imageLarge: ImageData;
-		/** Small image (bottom-right, staggered) */
-		imageSmall: ImageData;
-		/** How much the small image overlaps/staggers up (default: 15%) */
+		/** Large media (top-left) */
+		mediaLarge: Media;
+		/** Small media (bottom-right, staggered) */
+		mediaSmall: Media;
+		/** How much the small media overlaps/staggers up (default: 15%) */
 		staggerAmount?: string;
 	}
 
-	let { imageLarge, imageSmall, staggerAmount = '15%' }: Props = $props();
+	let { mediaLarge, mediaSmall, staggerAmount = '15%' }: Props = $props();
 
 	let visible = $state(false);
 </script>
@@ -42,28 +40,28 @@
 	use:inview={{ threshold: 0.15 }}
 	oninview={() => (visible = true)}
 >
-	<!-- Row 1: Large image aligned left -->
+	<!-- Row 1: Large media aligned left -->
 	<div class="diagonal__row diagonal__row--large">
 		<div class="diagonal__media-container diagonal__media-container--large">
-			<div class="diagonal__image-wrapper">
+			<div class="diagonal__media-wrapper">
 				<div class="diagonal__curtain"></div>
-				<img src={imageLarge.src} alt={imageLarge.alt} loading="lazy" />
+				<MediaItem media={mediaLarge} class="diagonal__media" loading="lazy" />
 			</div>
-			{#if imageLarge.caption}
-				<p class="diagonal__caption">{imageLarge.caption}</p>
+			{#if mediaLarge.caption}
+				<p class="diagonal__caption">{mediaLarge.caption}</p>
 			{/if}
 		</div>
 	</div>
 
-	<!-- Row 2: Small image aligned right with stagger overlap -->
+	<!-- Row 2: Small media aligned right with stagger overlap -->
 	<div class="diagonal__row diagonal__row--small" style="--stagger: -{staggerAmount}">
 		<div class="diagonal__media-container diagonal__media-container--small">
-			<div class="diagonal__image-wrapper">
+			<div class="diagonal__media-wrapper">
 				<div class="diagonal__curtain diagonal__curtain--delayed"></div>
-				<img src={imageSmall.src} alt={imageSmall.alt} loading="lazy" />
+				<MediaItem media={mediaSmall} class="diagonal__media" loading="lazy" />
 			</div>
-			{#if imageSmall.caption}
-				<p class="diagonal__caption">{imageSmall.caption}</p>
+			{#if mediaSmall.caption}
+				<p class="diagonal__caption">{mediaSmall.caption}</p>
 			{/if}
 		</div>
 	</div>
@@ -91,7 +89,7 @@
 		justify-content: flex-end;
 	}
 
-	/* Media containers control image widths */
+	/* Media containers control widths */
 	.diagonal__media-container {
 		position: relative;
 	}
@@ -104,8 +102,8 @@
 		width: 45%;
 	}
 
-	/* Image wrapper with aspect ratio */
-	.diagonal__image-wrapper {
+	/* Media wrapper with aspect ratio */
+	.diagonal__media-wrapper {
 		position: relative;
 		overflow: hidden;
 		background-color: var(--color-bg-elevated);
@@ -113,7 +111,7 @@
 		aspect-ratio: 3 / 2;
 	}
 
-	.diagonal__image-wrapper img {
+	.diagonal__media-wrapper :global(.diagonal__media) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -121,7 +119,7 @@
 		transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.diagonal.visible .diagonal__image-wrapper img {
+	.diagonal.visible .diagonal__media-wrapper :global(.diagonal__media) {
 		transform: scale(1);
 	}
 

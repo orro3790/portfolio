@@ -11,6 +11,7 @@
 	import TGridSection from '$lib/components/sections/TGridSection.svelte';
 	import FullBleedImage from '$lib/components/sections/FullBleedImage.svelte';
 	import Carousel from '$lib/components/sections/Carousel.svelte';
+	import VerticalCarousel from '$lib/components/sections/VerticalCarousel.svelte';
 	import AsymmetricGrid from '$lib/components/sections/AsymmetricGrid.svelte';
 	import Diagonal from '$lib/components/sections/Diagonal.svelte';
 
@@ -30,6 +31,10 @@
 
 	// Data comes pre-validated from server (404 already handled)
 	const project = $derived(data.project);
+
+	// nextProject is available for future "Next Project" navigation feature
+	const _nextProject = $derived(data.nextProject);
+	void _nextProject; // Acknowledge unused prop to prevent lint warning
 
 	// Track visibility for reveal animations
 	let heroVisible = $state(false);
@@ -78,7 +83,7 @@
 
 	<!-- Hero Image -->
 	<section class="project__hero-image">
-		<div class="project__image-wrapper" style="view-transition-name: project-hero-{project.slug}">
+		<div class="project__image-wrapper" style="view-transition-name: project-hero">
 			<img src={project.heroImage} alt={project.title} loading="eager" />
 			<!-- Placeholder gradient for missing images -->
 			<div class="project__image-placeholder" aria-hidden="true">
@@ -101,45 +106,47 @@
 							? 'right'
 							: 'left'}
 				/>
-				<!-- Full-width image -->
+				<!-- Full-width media -->
 			{:else if section.type === 'fw-std-53' && section.media?.[0]}
 				<FullBleedImage
-					src={section.media[0].src}
-					alt={section.media[0].alt || ''}
+					media={section.media[0]}
 					caption={section.media[0].caption}
 					aspectRatio="5/3"
 					revealFrom="bottom"
 				/>
-				<!-- Carousel -->
+				<!-- Carousel (horizontal) -->
 			{:else if section.type === 'carousel' && section.media}
 				<Carousel
-					images={section.media.map((m) => ({
-						src: m.src,
-						alt: m.alt || '',
-						caption: m.caption
-					}))}
+					media={section.media}
 					initialIndex={section.initialIndex}
+				/>
+				<!-- Vertical Carousel (scroll-jacked) -->
+			{:else if section.type === 'vertical-carousel' && section.media && section.heading && section.body}
+				<VerticalCarousel
+					media={section.media}
+					heading={section.heading}
+					body={section.body}
+					eyebrow={section.eyebrow}
 				/>
 				<!-- Asymmetric Grid -->
 			{:else if section.type === 'asymmetric-grid' && section.media && section.media.length >= 2 && section.largePosition && section.smallPosition}
 				<AsymmetricGrid
 					largePosition={section.largePosition}
 					smallPosition={section.smallPosition}
-					imageLarge={{ src: section.media[0].src, alt: section.media[0].alt || '' }}
-					imageSmall={{ src: section.media[1].src, alt: section.media[1].alt || '' }}
+					mediaLarge={section.media[0]}
+					mediaSmall={section.media[1]}
 					textContent={section.textContent}
 				/>
 				<!-- Diagonal -->
 			{:else if section.type === 'diagonal' && section.media && section.media.length >= 2}
 				<Diagonal
-					imageLarge={{ src: section.media[0].src, alt: section.media[0].alt || '' }}
-					imageSmall={{ src: section.media[1].src, alt: section.media[1].alt || '' }}
+					mediaLarge={section.media[0]}
+					mediaSmall={section.media[1]}
 				/>
 				<!-- General-purpose layout sections -->
 			{:else if section.type === 'full-bleed-image' && section.media?.[0]}
 				<FullBleedImage
-					src={section.media[0].src}
-					alt={section.media[0].alt || ''}
+					media={section.media[0]}
 					caption={section.media[0].caption}
 					revealFrom={section.revealFrom || 'bottom'}
 				/>
@@ -151,31 +158,10 @@
 					layout={section.layout === 'heading-right' ? 'heading-right' : 'heading-left'}
 				/>
 			{:else if section.type === 'image-grid' && section.media}
-				<ImageGrid images={section.media.map((m) => ({ src: m.src, alt: m.alt || '' }))} />
+				<ImageGrid media={section.media} />
 			{:else if section.type === 'quad-grid' && section.media && section.media.length >= 4}
 				<QuadGrid
-					images={[
-						{
-							src: section.media[0].src,
-							alt: section.media[0].alt || '',
-							caption: section.media[0].caption
-						},
-						{
-							src: section.media[1].src,
-							alt: section.media[1].alt || '',
-							caption: section.media[1].caption
-						},
-						{
-							src: section.media[2].src,
-							alt: section.media[2].alt || '',
-							caption: section.media[2].caption
-						},
-						{
-							src: section.media[3].src,
-							alt: section.media[3].alt || '',
-							caption: section.media[3].caption
-						}
-					]}
+					media={[section.media[0], section.media[1], section.media[2], section.media[3]]}
 					gap={section.gap === 'large' ? 'medium' : section.gap}
 					aspectRatio={section.aspectRatio}
 				/>

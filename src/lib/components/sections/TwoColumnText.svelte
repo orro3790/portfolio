@@ -41,7 +41,7 @@
 			<h2 class="two-column__heading">{heading}</h2>
 		</div>
 		<div class="two-column__body-col">
-			{#each paragraphs as paragraph, i}
+			{#each paragraphs as paragraph, i (i)}
 				<p class="two-column__paragraph" style="--delay: {i * 100}ms">
 					{paragraph}
 				</p>

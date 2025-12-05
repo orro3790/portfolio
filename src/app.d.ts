@@ -12,6 +12,7 @@ declare global {
 
 // Augment svelte/elements for custom action events
 declare module 'svelte/elements' {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	interface HTMLAttributes<T> {
 		oninview?: (event: CustomEvent<{ inView: boolean; entry: IntersectionObserverEntry }>) => void;
 	}

@@ -19,8 +19,10 @@ export type Media = z.infer<typeof mediaSchema>;
  * - t-grid-*: Text-only sections on 6-column grid (hero/left/right)
  * - fw-*: Full-width image sections
  * - carousel: Horizontal scrolling gallery
+ * - vertical-carousel: Scroll-jacked vertical gallery with two-column layout
  * - asymmetric-grid: 2-column layout with large+small images
  * - diagonal: Staggered large/small image layout
+ * - quad-grid: 2×2 equal image grid
  */
 export const sectionSchema = z.object({
 	type: z.enum([
@@ -36,8 +38,10 @@ export const sectionSchema = z.object({
 		't-grid-right',
 		// Full-width image section
 		'fw-std-53',
-		// Carousel
+		// Carousel (horizontal)
 		'carousel',
+		// Vertical carousel (scroll-jacked, two-column)
+		'vertical-carousel',
 		// Asymmetric grid
 		'asymmetric-grid',
 		// Diagonal layout
@@ -93,11 +97,20 @@ export type ProjectMeta = z.infer<typeof projectMetaSchema>;
  *
  * Templates:
  * - 'layers': Default. Tags↓, Title→, Desc↑, Image curtain←
- * - 'suno': Desc→, Title←, Tags↓, Image diagonal↗
- * - 'ro': Desc←, Title←, Tags↑, Image→ (image on LEFT)
- * - 'atoms': Desc→, Title←, Tags↓, Image diagonal↗
+ * - 'suno': Desc→ (from left), Title←, Tags↓, Image curtain→
+ * - 'ro': Desc←, Title←, Tags↑, Image curtain→ (image on LEFT)
+ * - 'atoms': Desc→ (from left), Title←, Tags↓, Image curtain→
+ * - 'hyper': Desc→, Title→ (from left), Tags↓, Image curtain← (image on LEFT)
+ * - 'waiting': Desc↑, Title↓, Tags↑, Image curtain↓
  */
-export const animationTemplateSchema = z.enum(['layers', 'suno', 'ro', 'atoms']);
+export const animationTemplateSchema = z.enum([
+	'layers',
+	'suno',
+	'ro',
+	'atoms',
+	'hyper',
+	'waiting'
+]);
 
 export type AnimationTemplate = z.infer<typeof animationTemplateSchema>;
 

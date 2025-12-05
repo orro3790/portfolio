@@ -1,7 +1,8 @@
 <script lang="ts">
 	/**
-	 * QuadGrid Section — 2×2 equal image grid.
-	 * Simple, balanced layout for showcasing 4 related images.
+	 * QuadGrid Section — 2×2 equal media grid.
+	 * Simple, balanced layout for showcasing 4 related media items.
+	 * Supports both images and videos.
 	 *
 	 * ╔═══════╦═══════╗
 	 * ║   A   ║   B   ║
@@ -10,23 +11,19 @@
 	 * ╚═══════╩═══════╝
 	 */
 	import { inview } from '$lib/actions/inView';
-
-	interface ImageData {
-		src: string;
-		alt: string;
-		caption?: string;
-	}
+	import MediaItem from '$lib/components/primitives/MediaItem.svelte';
+	import type { Media } from '$lib/schemas/project';
 
 	interface Props {
-		/** Array of exactly 4 images [A, B, C, D] */
-		images: [ImageData, ImageData, ImageData, ImageData];
-		/** Gap between images */
+		/** Array of exactly 4 media items [A, B, C, D] */
+		media: [Media, Media, Media, Media];
+		/** Gap between media items */
 		gap?: 'none' | 'small' | 'medium';
 		/** Aspect ratio for each cell */
 		aspectRatio?: string;
 	}
 
-	let { images, gap = 'small', aspectRatio = '1/1' }: Props = $props();
+	let { media, gap = 'small', aspectRatio = '1/1' }: Props = $props();
 
 	let visible = $state(false);
 </script>
@@ -41,14 +38,14 @@
 	oninview={() => (visible = true)}
 >
 	<div class="quad-grid__layout">
-		{#each images as image, i}
+		{#each media as item, i (item.src)}
 			<div class="quad-grid__cell" style="--delay: {i * 100}ms">
-				<div class="quad-grid__image-wrapper" style="--aspect-ratio: {aspectRatio}">
+				<div class="quad-grid__media-wrapper" style="--aspect-ratio: {aspectRatio}">
 					<div class="quad-grid__curtain"></div>
-					<img src={image.src} alt={image.alt} loading="lazy" />
+					<MediaItem media={item} class="quad-grid__media" loading="lazy" />
 				</div>
-				{#if image.caption}
-					<p class="quad-grid__caption">{image.caption}</p>
+				{#if item.caption}
+					<p class="quad-grid__caption">{item.caption}</p>
 				{/if}
 			</div>
 		{/each}
@@ -85,14 +82,14 @@
 		position: relative;
 	}
 
-	.quad-grid__image-wrapper {
+	.quad-grid__media-wrapper {
 		position: relative;
 		aspect-ratio: var(--aspect-ratio, 4/3);
 		overflow: hidden;
 		background-color: var(--color-bg-elevated);
 	}
 
-	.quad-grid__image-wrapper img {
+	.quad-grid__media-wrapper :global(.quad-grid__media) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -100,7 +97,7 @@
 		transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.quad-grid.visible .quad-grid__image-wrapper img {
+	.quad-grid.visible .quad-grid__media-wrapper :global(.quad-grid__media) {
 		transform: scale(1);
 	}
 

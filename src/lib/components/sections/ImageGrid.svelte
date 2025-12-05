@@ -1,25 +1,22 @@
 <script lang="ts">
 	/**
 	 * ImageGrid Section
-	 * Responsive grid of images with staggered fade-in animation.
+	 * Responsive grid of media items (images/videos) with staggered fade-in animation.
 	 */
 	import { inview } from '$lib/actions/inView';
-
-	interface GridImage {
-		src: string;
-		alt: string;
-	}
+	import MediaItem from '$lib/components/primitives/MediaItem.svelte';
+	import type { Media } from '$lib/schemas/project';
 
 	interface Props {
-		/** Array of images to display */
-		images: GridImage[];
+		/** Array of media items to display */
+		media: Media[];
 		/** Number of columns (2, 3, or 4) */
 		columns?: 2 | 3 | 4;
-		/** Gap between images */
+		/** Gap between media items */
 		gap?: 'small' | 'medium' | 'large';
 	}
 
-	let { images, columns = 2, gap = 'medium' }: Props = $props();
+	let { media, columns = 2, gap = 'medium' }: Props = $props();
 
 	let visible = $state(false);
 </script>
@@ -35,9 +32,9 @@
 	oninview={() => (visible = true)}
 >
 	<div class="image-grid__container">
-		{#each images as image, i}
+		{#each media as item, i (item.src)}
 			<div class="image-grid__item" style="--delay: {i * 100}ms">
-				<img src={image.src} alt={image.alt} class="image-grid__image" loading="lazy" />
+				<MediaItem media={item} class="image-grid__media" loading="lazy" />
 			</div>
 		{/each}
 	</div>
@@ -99,14 +96,14 @@
 		transform: translateY(0) scale(1);
 	}
 
-	.image-grid__image {
+	.image-grid__item :global(.image-grid__media) {
 		width: 100%;
 		height: auto;
 		display: block;
 		transition: transform 0.4s ease;
 	}
 
-	.image-grid__item:hover .image-grid__image {
+	.image-grid__item:hover :global(.image-grid__media) {
 		transform: scale(1.03);
 	}
 </style>
