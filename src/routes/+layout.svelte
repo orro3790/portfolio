@@ -3,15 +3,16 @@
 	 * Root app layout sets global chrome, meta tags, and shared navigation.
 	 */
 	import '../app.css';
+	import { page } from '$app/stores';
 	import Header from '$lib/components/Header.svelte';
 	import ProjectNav from '$lib/components/ProjectNav.svelte';
-	import { navItemsWithPreview } from '$lib/data/projects';
 	import { onNavigate, afterNavigate } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import Lenis from 'lenis';
 	import { lenisStore } from '$lib/stores/lenis';
 
 	let { children } = $props();
+	let navigation = $derived($page.data.navigation || []);
 
 	/** Site title displayed in browser tab */
 	const siteTitle = 'Portfolio';
@@ -79,7 +80,7 @@
 
 <div class="app">
 	<Header />
-	<ProjectNav items={navItemsWithPreview} />
+	<ProjectNav items={navigation} />
 
 	<main class="main">
 		{@render children()}
