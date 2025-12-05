@@ -3,7 +3,7 @@
  * Fetches project by slug from Sanity with prerender support.
  * @module routes/work/[slug]/+page.server
  */
-import { error } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { client, getClient } from '$lib/sanity/client';
 import { projectBySlugQuery, projectsListQuery, projectSlugsQuery } from '$lib/sanity/queries';
 import { transformProject } from '$lib/sanity/transform';
@@ -34,7 +34,8 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 	]);
 
 	if (!sanityProject) {
-		throw error(404, 'Project not found');
+		// Gracefully handle stale links by returning to the work index during prerender
+		throw redirect(307, '/work');
 	}
 
 	const project = transformProject(sanityProject);

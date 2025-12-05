@@ -4,9 +4,9 @@
 	 * Site footer with project navigation and contact link.
 	 * Shows active state for current page.
 	 */
-	import { page } from '$app/stores';
-	import { resolve } from '$app/paths';
-	import { navItems } from '$lib/data/projects';
+	import { page } from '$app/state';
+import { resolve } from '$app/paths';
+import type { NavItemWithPreview } from '$lib/schemas/project';
 
 	interface Props {
 		instagram?: string;
@@ -17,7 +17,10 @@
 	const year = new Date().getFullYear();
 
 	// Get current path for active state
-	const currentPath = $derived($page.url.pathname);
+	const currentPath = $derived(page.url.pathname);
+
+	// Navigation from root layout (Sanity-backed)
+	const navItems = $derived((page.data.navigation as NavItemWithPreview[]) ?? []);
 </script>
 
 <footer class="footer">
