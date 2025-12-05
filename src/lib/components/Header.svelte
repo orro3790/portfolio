@@ -9,7 +9,12 @@
 	let isContactPage = $derived($page.url.pathname === '/contact');
 </script>
 
-<header class="header" class:desktop-hidden={isLandingPage} class:hidden={isContactPage} class:menu-active={$isMenuOpen}>
+<header
+	class="header"
+	class:desktop-hidden={isLandingPage}
+	class:hidden={isContactPage}
+	class:menu-active={$isMenuOpen}
+>
 	<div class="header__inner">
 		<button
 			class="header__menu-btn btn"

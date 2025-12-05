@@ -363,7 +363,8 @@ export const projects: Project[] = [
 		heroImage: 'https://images.unsplash.com/photo-1502759683299-cdcd6974244f?w=1200&h=800&fit=crop',
 		backgroundImage:
 			'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop',
-		previewImage: 'https://images.unsplash.com/photo-1502759683299-cdcd6974244f?w=1200&h=800&fit=crop',
+		previewImage:
+			'https://images.unsplash.com/photo-1502759683299-cdcd6974244f?w=1200&h=800&fit=crop',
 		accentColor: 'hsl(45, 30%, 25%)',
 		preview: {
 			description: 'Capturing the poetry of natural light as it transforms interior spaces.',
@@ -396,7 +397,8 @@ export const projects: Project[] = [
 		heroImage: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&h=800&fit=crop',
 		backgroundImage:
 			'https://images.unsplash.com/photo-1490312278390-ab64016e0aa9?w=1920&h=1080&fit=crop',
-		previewImage: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&h=800&fit=crop',
+		previewImage:
+			'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&h=800&fit=crop',
 		accentColor: 'hsl(25, 35%, 30%)',
 		preview: {
 			description: 'Handcrafted stoneware vessels inspired by organic forms found in nature.',
@@ -429,7 +431,8 @@ export const projects: Project[] = [
 		heroImage: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=1200&h=800&fit=crop',
 		backgroundImage:
 			'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=1920&h=1080&fit=crop',
-		previewImage: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=1200&h=800&fit=crop',
+		previewImage:
+			'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=1200&h=800&fit=crop',
 		accentColor: 'hsl(220, 25%, 15%)',
 		preview: {
 			description: 'Wordless stories told through expressive charcoal and ink compositions.',
@@ -462,7 +465,8 @@ export const projects: Project[] = [
 		heroImage: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1200&h=800&fit=crop',
 		backgroundImage:
 			'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1920&h=1080&fit=crop',
-		previewImage: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1200&h=800&fit=crop',
+		previewImage:
+			'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1200&h=800&fit=crop',
 		accentColor: 'hsl(180, 30%, 25%)',
 		preview: {
 			description:

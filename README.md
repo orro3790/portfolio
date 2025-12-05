@@ -59,11 +59,13 @@ vercel
 ```
 
 Or connect via GitHub:
+
 1. Push to GitHub
 2. Import project at [vercel.com/new](https://vercel.com/new)
 3. Vercel auto-detects SvelteKit
 
 **Environment Variables in Vercel Dashboard:**
+
 - `PUBLIC_SANITY_PROJECT_ID` = `mrcn4yss`
 - `PUBLIC_SANITY_DATASET` = `production`
 - `SANITY_API_TOKEN` = (generate from Sanity manage)
@@ -93,10 +95,10 @@ In **Vercel Dashboard** → Project → Settings → Domains → Add `juayang.co
 
 In **Namecheap** → Domain List → Manage → Advanced DNS:
 
-| Type | Host | Value | TTL |
-|------|------|-------|-----|
-| A | @ | 76.76.21.21 | Automatic |
-| CNAME | www | cname.vercel-dns.com | Automatic |
+| Type  | Host | Value                | TTL       |
+| ----- | ---- | -------------------- | --------- |
+| A     | @    | 76.76.21.21          | Automatic |
+| CNAME | www  | cname.vercel-dns.com | Automatic |
 
 **For studio subdomain** (if self-hosting):
 | Type | Host | Value | TTL |
@@ -108,6 +110,7 @@ In **Namecheap** → Domain List → Manage → Advanced DNS:
 Go to [sanity.io/manage](https://sanity.io/manage) → Project → API → CORS Origins:
 
 Add:
+
 - `https://juayang.com`
 - `https://www.juayang.com`
 - `http://localhost:5173` (for local dev)

@@ -9,5 +9,3 @@ import type Lenis from 'lenis';
  * Set from +layout.svelte, consumed by scroll-linked components.
  */
 export const lenisStore = writable<Lenis | null>(null);
-
-

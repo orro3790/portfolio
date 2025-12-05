@@ -4,10 +4,10 @@
 	 * Two-column layout: portrait image with name overlay (left),
 	 * centered text block (right). Full viewport, no scrolling.
 	 */
-	import {onDestroy} from 'svelte';
-	import {page} from '$app/stores';
-	import {inview} from '$lib/actions/inView';
-	import {getImageUrl} from '$lib/sanity/imageUrl';
+	import { onDestroy } from 'svelte';
+	import { page } from '$app/stores';
+	import { inview } from '$lib/actions/inView';
+	import { getImageUrl } from '$lib/sanity/imageUrl';
 
 	let imageVisible = $state(false);
 	let textVisible = $state(false);
@@ -22,7 +22,7 @@
 		name: siteSettings?.artistName || 'Artist Name',
 		subtitle: siteSettings?.artistSubtitle || 'Visual Artist',
 		portrait: siteSettings?.portrait
-			? getImageUrl(siteSettings.portrait, {width: 800, height: 1000})
+			? getImageUrl(siteSettings.portrait, { width: 800, height: 1000 })
 			: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&h=1000',
 		bioHeading: siteSettings?.bioHeading || 'About',
 		bio:
@@ -30,7 +30,7 @@
 			`Creating at the intersection of traditional craft and contemporary expression. My work explores themes of identity, memory, and the subtle beauty found in everyday moments.
 
 Each piece is an invitation to pause, reflect, and discover something new within the familiar.`,
-		email: siteSettings?.email || 'hello@example.com',
+		email: siteSettings?.email || 'hello@example.com'
 	});
 
 	/** Split bio into paragraphs */
@@ -117,7 +117,7 @@ Each piece is an invitation to pause, reflect, and discover something new within
 				<button
 					type="button"
 					class="contact__email"
-					on:click={handleCopyEmail}
+					onclick={handleCopyEmail}
 					aria-label={`Copy ${artist.email} to clipboard`}
 				>
 					<span class="contact__email-text">{artist.email}</span>
@@ -137,8 +137,12 @@ Each piece is an invitation to pause, reflect, and discover something new within
 								aria-hidden="true"
 							>
 								<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-								<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-								<path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+								<path
+									d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"
+								/>
+								<path
+									d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"
+								/>
 								<path d="M9 14l2 2l4 -4" />
 							</svg>
 							<span>Copied</span>

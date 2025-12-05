@@ -33,7 +33,6 @@
 			visible = true;
 		}
 	}
-
 </script>
 
 <section
@@ -153,6 +152,3 @@
 		transform: translateY(0);
 	}
 </style>
-
-
-

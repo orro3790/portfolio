@@ -22,12 +22,12 @@ export const projectsListQuery = `*[_type == "project"] | order(order asc) {
   previewDescription,
   previewTags,
   animationTemplate
-}`
+}`;
 
 /**
  * Get all project slugs for static prerendering.
  */
-export const projectSlugsQuery = `*[_type == "project"].slug.current`
+export const projectSlugsQuery = `*[_type == "project"].slug.current`;
 
 /**
  * Get a single project by slug with all section data.
@@ -80,7 +80,7 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
     gap,
     columns
   }
-}`
+}`;
 
 /**
  * Get site settings (singleton document).
@@ -96,7 +96,7 @@ export const siteSettingsQuery = `*[_type == "siteSettings"][0] {
   bio,
   heroTitle,
   heroSubtitle
-}`
+}`;
 
 /**
  * Get navigation items (for Header/Footer).
@@ -111,5 +111,4 @@ export const navigationQuery = `*[_type == "project"] | order(order asc) {
   previewDescription,
   previewTags,
   animationTemplate
-}`
-
+}`;

@@ -21,7 +21,6 @@
 
 	let visible = $state(false);
 
-
 	// Split body into paragraphs
 	const paragraphs = $derived(body.split('\n\n').filter((p) => p.trim()));
 </script>
@@ -148,4 +147,3 @@
 		margin-bottom: 0;
 	}
 </style>
-

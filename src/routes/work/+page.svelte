@@ -1,9 +1,9 @@
 <script lang="ts">
-	import {inView} from '$lib/actions/inView';
-	import {resolve} from '$app/paths';
+	import { inView } from '$lib/actions/inView';
+	import { resolve } from '$app/paths';
 	import Footer from '$lib/components/Footer.svelte';
 	import PreviewBanner from '$lib/components/PreviewBanner.svelte';
-	import {getImageUrl} from '$lib/sanity/imageUrl';
+	import { getImageUrl } from '$lib/sanity/imageUrl';
 
 	export let data;
 
@@ -18,9 +18,7 @@
 
 <section class="work">
 	<header class="work__header container">
-		<h1 class="work__title reveal" use:inView>
-			All Work
-		</h1>
+		<h1 class="work__title reveal" use:inView>All Work</h1>
 		<p class="work__subtitle reveal reveal-delay-1" use:inView>
 			A collection of selected projects across various mediums
 		</p>
@@ -28,15 +26,11 @@
 
 	<div class="work__grid container">
 		{#each projects as project, index (project.slug)}
-			<article
-				class="work__item reveal"
-				style="--delay: {index * 100}ms"
-				use:inView
-			>
+			<article class="work__item reveal" style="--delay: {index * 100}ms" use:inView>
 				<a href={resolve(`/work/${project.slug}`)} class="work__item-link">
 					<div class="work__item-image">
 						<img
-							src={getImageUrl(project.previewImage, {width: 800})}
+							src={getImageUrl(project.previewImage, { width: 800 })}
 							alt={project.previewImage?.alt || project.title}
 							loading="lazy"
 						/>
@@ -139,11 +133,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: linear-gradient(
-			135deg,
-			var(--color-bg-elevated) 0%,
-			var(--color-border) 100%
-		);
+		background: linear-gradient(135deg, var(--color-bg-elevated) 0%, var(--color-border) 100%);
 	}
 
 	.work__item-placeholder span {
@@ -154,7 +144,7 @@
 		opacity: 0.3;
 	}
 
-	.work__item-image img:not([src=""]):not([src*="placeholder"]) + .work__item-placeholder {
+	.work__item-image img:not([src='']):not([src*='placeholder']) + .work__item-placeholder {
 		display: none;
 	}
 
@@ -193,4 +183,3 @@
 		transition-delay: 150ms;
 	}
 </style>
-

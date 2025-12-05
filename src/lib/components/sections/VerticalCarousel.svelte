@@ -212,7 +212,12 @@
 									style="--curtain-delay: {i * 80}ms"
 									aria-hidden="true"
 								></div>
-								<MediaItem media={item} class="vertical-carousel__media" loading="lazy" draggable={false} />
+								<MediaItem
+									media={item}
+									class="vertical-carousel__media"
+									loading="lazy"
+									draggable={false}
+								/>
 							</div>
 						</div>
 					{/each}

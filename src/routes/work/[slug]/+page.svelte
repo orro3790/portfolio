@@ -23,7 +23,6 @@
 	interface Props {
 		data: {
 			project: Project;
-			nextProject: Project | undefined;
 		};
 	}
 
@@ -31,10 +30,6 @@
 
 	// Data comes pre-validated from server (404 already handled)
 	const project = $derived(data.project);
-
-	// nextProject is available for future "Next Project" navigation feature
-	const _nextProject = $derived(data.nextProject);
-	void _nextProject; // Acknowledge unused prop to prevent lint warning
 
 	// Track visibility for reveal animations
 	let heroVisible = $state(false);
@@ -48,131 +43,125 @@
 
 <!-- Key block forces remount when navigating between projects, resetting all animation states -->
 {#key project.slug}
-<article class="project">
-	<!-- Hero Section -->
-	<header class="project__hero">
-		<div class="project__hero-content container">
-			<h1
-				class="project__title reveal"
-				class:visible={heroVisible}
-				use:inview={{ threshold: 0.2 }}
-				oninview={() => (heroVisible = true)}
-			>
-				{project.title}
-			</h1>
+	<article class="project">
+		<!-- Hero Section -->
+		<header class="project__hero">
+			<div class="project__hero-content container">
+				<h1
+					class="project__title reveal"
+					class:visible={heroVisible}
+					use:inview={{ threshold: 0.2 }}
+					oninview={() => (heroVisible = true)}
+				>
+					{project.title}
+				</h1>
 
-			<div
-				class="project__meta reveal reveal-delay-1"
-				class:visible={metaVisible}
-				use:inview={{ threshold: 0.2 }}
-				oninview={() => (metaVisible = true)}
-			>
-				<div class="project__meta-item project__meta-item--col-1">
-					<span class="project__meta-label">Project Type</span>
-					<span class="project__meta-value">{project.meta.projectType}</span>
-				</div>
-				<div class="project__meta-item project__meta-item--col-4">
-					<span class="project__meta-label">Stage</span>
-					<span class="project__meta-value">{project.meta.stage}</span>
-				</div>
-				<div class="project__meta-item project__meta-item--col-5">
-					<span class="project__meta-label">Deliverables</span>
-					<span class="project__meta-value">{project.meta.deliverables}</span>
+				<div
+					class="project__meta reveal reveal-delay-1"
+					class:visible={metaVisible}
+					use:inview={{ threshold: 0.2 }}
+					oninview={() => (metaVisible = true)}
+				>
+					<div class="project__meta-item project__meta-item--col-1">
+						<span class="project__meta-label">Project Type</span>
+						<span class="project__meta-value">{project.meta.projectType}</span>
+					</div>
+					<div class="project__meta-item project__meta-item--col-4">
+						<span class="project__meta-label">Stage</span>
+						<span class="project__meta-value">{project.meta.stage}</span>
+					</div>
+					<div class="project__meta-item project__meta-item--col-5">
+						<span class="project__meta-label">Deliverables</span>
+						<span class="project__meta-value">{project.meta.deliverables}</span>
+					</div>
 				</div>
 			</div>
-		</div>
-	</header>
+		</header>
 
-	<!-- Hero Image -->
-	<section class="project__hero-image">
-		<div class="project__image-wrapper" style="view-transition-name: project-hero">
-			<img src={project.heroImage} alt={project.title} loading="eager" />
-			<!-- Placeholder gradient for missing images -->
-			<div class="project__image-placeholder" aria-hidden="true">
-				<span>{project.title}</span>
+		<!-- Hero Image -->
+		<section class="project__hero-image">
+			<div class="project__image-wrapper" style="view-transition-name: project-hero">
+				<img src={project.heroImage} alt={project.title} loading="eager" />
+				<!-- Placeholder gradient for missing images -->
+				<div class="project__image-placeholder" aria-hidden="true">
+					<span>{project.title}</span>
+				</div>
 			</div>
-		</div>
-	</section>
+		</section>
 
-	<!-- Content Sections -->
-	{#if project.sections}
-		{#each project.sections as section, index (index)}
-			<!-- Text sections (T-Grid) -->
-			{#if (section.type === 't-grid-hero' || section.type === 't-grid-left' || section.type === 't-grid-right') && section.text}
-				<TGridSection
-					text={section.text}
-					eyebrow={section.eyebrow}
-					variant={section.type === 't-grid-hero'
-						? 'hero'
-						: section.type === 't-grid-right'
-							? 'right'
-							: 'left'}
-				/>
-				<!-- Full-width media -->
-			{:else if section.type === 'fw-std-53' && section.media?.[0]}
-				<FullBleedImage
-					media={section.media[0]}
-					caption={section.media[0].caption}
-					aspectRatio="5/3"
-					revealFrom="bottom"
-				/>
-				<!-- Carousel (horizontal) -->
-			{:else if section.type === 'carousel' && section.media}
-				<Carousel
-					media={section.media}
-					initialIndex={section.initialIndex}
-				/>
-				<!-- Vertical Carousel (scroll-jacked) -->
-			{:else if section.type === 'vertical-carousel' && section.media && section.heading && section.body}
-				<VerticalCarousel
-					media={section.media}
-					heading={section.heading}
-					body={section.body}
-					eyebrow={section.eyebrow}
-				/>
-				<!-- Asymmetric Grid -->
-			{:else if section.type === 'asymmetric-grid' && section.media && section.media.length >= 2 && section.largePosition && section.smallPosition}
-				<AsymmetricGrid
-					largePosition={section.largePosition}
-					smallPosition={section.smallPosition}
-					mediaLarge={section.media[0]}
-					mediaSmall={section.media[1]}
-					textContent={section.textContent}
-				/>
-				<!-- Diagonal -->
-			{:else if section.type === 'diagonal' && section.media && section.media.length >= 2}
-				<Diagonal
-					mediaLarge={section.media[0]}
-					mediaSmall={section.media[1]}
-				/>
-				<!-- General-purpose layout sections -->
-			{:else if section.type === 'full-bleed-image' && section.media?.[0]}
-				<FullBleedImage
-					media={section.media[0]}
-					caption={section.media[0].caption}
-					revealFrom={section.revealFrom || 'bottom'}
-				/>
-			{:else if section.type === 'two-column' && section.heading && section.body}
-				<TwoColumnText
-					heading={section.heading}
-					body={section.body}
-					eyebrow={section.eyebrow}
-					layout={section.layout === 'heading-right' ? 'heading-right' : 'heading-left'}
-				/>
-			{:else if section.type === 'image-grid' && section.media}
-				<ImageGrid media={section.media} />
-			{:else if section.type === 'quad-grid' && section.media && section.media.length >= 4}
-				<QuadGrid
-					media={[section.media[0], section.media[1], section.media[2], section.media[3]]}
-					gap={section.gap === 'large' ? 'medium' : section.gap}
-					aspectRatio={section.aspectRatio}
-				/>
-			{/if}
-		{/each}
-	{/if}
-</article>
+		<!-- Content Sections -->
+		{#if project.sections}
+			{#each project.sections as section, index (index)}
+				<!-- Text sections (T-Grid) -->
+				{#if (section.type === 't-grid-hero' || section.type === 't-grid-left' || section.type === 't-grid-right') && section.text}
+					<TGridSection
+						text={section.text}
+						eyebrow={section.eyebrow}
+						variant={section.type === 't-grid-hero'
+							? 'hero'
+							: section.type === 't-grid-right'
+								? 'right'
+								: 'left'}
+					/>
+					<!-- Full-width media -->
+				{:else if section.type === 'fw-std-53' && section.media?.[0]}
+					<FullBleedImage
+						media={section.media[0]}
+						caption={section.media[0].caption}
+						aspectRatio="5/3"
+						revealFrom="bottom"
+					/>
+					<!-- Carousel (horizontal) -->
+				{:else if section.type === 'carousel' && section.media}
+					<Carousel media={section.media} initialIndex={section.initialIndex} />
+					<!-- Vertical Carousel (scroll-jacked) -->
+				{:else if section.type === 'vertical-carousel' && section.media && section.heading && section.body}
+					<VerticalCarousel
+						media={section.media}
+						heading={section.heading}
+						body={section.body}
+						eyebrow={section.eyebrow}
+					/>
+					<!-- Asymmetric Grid -->
+				{:else if section.type === 'asymmetric-grid' && section.media && section.media.length >= 2 && section.largePosition && section.smallPosition}
+					<AsymmetricGrid
+						largePosition={section.largePosition}
+						smallPosition={section.smallPosition}
+						mediaLarge={section.media[0]}
+						mediaSmall={section.media[1]}
+						textContent={section.textContent}
+					/>
+					<!-- Diagonal -->
+				{:else if section.type === 'diagonal' && section.media && section.media.length >= 2}
+					<Diagonal mediaLarge={section.media[0]} mediaSmall={section.media[1]} />
+					<!-- General-purpose layout sections -->
+				{:else if section.type === 'full-bleed-image' && section.media?.[0]}
+					<FullBleedImage
+						media={section.media[0]}
+						caption={section.media[0].caption}
+						revealFrom={section.revealFrom || 'bottom'}
+					/>
+				{:else if section.type === 'two-column' && section.heading && section.body}
+					<TwoColumnText
+						heading={section.heading}
+						body={section.body}
+						eyebrow={section.eyebrow}
+						layout={section.layout === 'heading-right' ? 'heading-right' : 'heading-left'}
+					/>
+				{:else if section.type === 'image-grid' && section.media}
+					<ImageGrid media={section.media} />
+				{:else if section.type === 'quad-grid' && section.media && section.media.length >= 4}
+					<QuadGrid
+						media={[section.media[0], section.media[1], section.media[2], section.media[3]]}
+						gap={section.gap === 'large' ? 'medium' : section.gap}
+						aspectRatio={section.aspectRatio}
+					/>
+				{/if}
+			{/each}
+		{/if}
+	</article>
 
-<Footer />
+	<Footer />
 {/key}
 
 <style>

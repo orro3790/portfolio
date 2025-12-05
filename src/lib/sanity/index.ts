@@ -4,10 +4,8 @@
  * @module lib/sanity
  */
 
-export {client, getClient, getPreviewClient} from './client'
-export {urlFor, getImageUrl, getImageSrcSet} from './imageUrl'
-export * from './queries'
-export * from './types'
-export {transformSection, transformProject} from './transform'
-
-
+export { client, getClient, getPreviewClient } from './client';
+export { urlFor, getImageUrl, getImageSrcSet } from './imageUrl';
+export * from './queries';
+export * from './types';
+export { transformSection, transformProject } from './transform';

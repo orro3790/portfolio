@@ -434,7 +434,8 @@ video {
 }
 
 @keyframes hero-fade-out {
-	0%, 30% {
+	0%,
+	30% {
 		opacity: 1;
 	}
 	100% {
@@ -453,6 +454,3 @@ video {
 		opacity: 1;
 	}
 }
-
-
-
