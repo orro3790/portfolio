@@ -23,7 +23,7 @@ export const projects: Project[] = [
 			description:
 				'Exploring color relationships and texture through layered acrylic compositions.',
 			tags: ['Painting', 'Acrylic'],
-			animationTemplate: 'layers'
+			animationTemplate: 'slide-right'
 		},
 		sections: [
 			// 1. T-grid-hero: Overview intro text
@@ -199,7 +199,7 @@ export const projects: Project[] = [
 		preview: {
 			description: 'Layered narratives from urban environments through collage and photography.',
 			tags: ['Mixed Media', 'Collage'],
-			animationTemplate: 'suno'
+			animationTemplate: 'sweep-left'
 		},
 		sections: [
 			{
@@ -369,7 +369,7 @@ export const projects: Project[] = [
 		preview: {
 			description: 'Capturing the poetry of natural light as it transforms interior spaces.',
 			tags: ['Photography', 'Digital'],
-			animationTemplate: 'ro'
+			animationTemplate: 'image-left'
 		},
 		sections: [
 			{
@@ -403,7 +403,7 @@ export const projects: Project[] = [
 		preview: {
 			description: 'Handcrafted stoneware vessels inspired by organic forms found in nature.',
 			tags: ['Sculpture', 'Ceramics'],
-			animationTemplate: 'atoms'
+			animationTemplate: 'cascade-left'
 		},
 		sections: [
 			{
@@ -437,7 +437,7 @@ export const projects: Project[] = [
 		preview: {
 			description: 'Wordless stories told through expressive charcoal and ink compositions.',
 			tags: ['Drawing', 'Charcoal'],
-			animationTemplate: 'hyper'
+			animationTemplate: 'slide-right'
 		},
 		sections: [
 			{
@@ -472,7 +472,7 @@ export const projects: Project[] = [
 			description:
 				'An exploration of childhood memories through the lens of waiting room experiences.',
 			tags: ['Installation', 'Mixed Media'],
-			animationTemplate: 'waiting'
+			animationTemplate: 'sweep-left'
 		},
 		sections: [
 			{

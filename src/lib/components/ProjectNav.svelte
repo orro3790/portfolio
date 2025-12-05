@@ -117,7 +117,7 @@
 	aria-hidden="true"
 >
 	{#if hoveredProject}
-		{@const template = hoveredProject.animationTemplate || 'layers'}
+		{@const template = hoveredProject.animationTemplate || 'slide-right'}
 		{#key hoveredProject.slug}
 			<div class="preview-content template-{template}">
 				<!-- Background Layer (Full screen, behind everything) -->
@@ -514,14 +514,14 @@
 	   - Tags: Bottom area, slides DOWN (from top)
 	   - Image: Right side, curtain reveal LEFT→RIGHT
 	   -------------------------------------------------------------------------- */
-	.template-suno .preview-title {
+	.template-sweep-left .preview-title {
 		left: 18%;
 		right: 50%;
 		bottom: 30%;
 		animation: sunoTitleSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-suno .preview-description {
+	.template-sweep-left .preview-description {
 		top: 15%;
 		right: 28%;
 		left: auto;
@@ -531,7 +531,7 @@
 		animation: sunoDescSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-suno .preview-tags {
+	.template-sweep-left .preview-tags {
 		top: auto;
 		bottom: 18%;
 		left: 55%;
@@ -540,14 +540,14 @@
 		animation: sunoTagsSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-suno .preview-image-wrapper {
+	.template-sweep-left .preview-image-wrapper {
 		top: 25%;
 		right: 5%;
 		bottom: auto;
 		height: 55%;
 		width: 28%;
-		/* Curtain reveal from right to left */
-		clip-path: inset(0 0 0 100%);
+		/* Curtain reveal from top to bottom */
+		clip-path: inset(100% 0 0 0);
 		opacity: 1;
 		animation: sunoCurtainReveal 1s cubic-bezier(0.7, 0, 0.3, 1) forwards;
 	}
@@ -579,7 +579,7 @@
 	@keyframes sunoTagsSlide {
 		from {
 			opacity: 0;
-			transform: translateY(-25px);
+			transform: translateY(25px);
 		}
 		to {
 			opacity: 1;
@@ -590,10 +590,10 @@
 	/* Curtain reveal right to left */
 	@keyframes sunoCurtainReveal {
 		from {
-			clip-path: inset(0 0 0 100%);
+			clip-path: inset(100% 0 0 0);
 		}
 		to {
-			clip-path: inset(0 0 0 0%);
+			clip-path: inset(0 0 0 0);
 		}
 	}
 
@@ -604,7 +604,7 @@
 	   - Tags: Below title, right side, slides UP (from bottom)
 	   - Image: Left side (smaller ~28%), curtain reveal LEFT→RIGHT
 	   -------------------------------------------------------------------------- */
-	.template-ro .preview-title {
+	.template-image-left .preview-title {
 		left: auto;
 		right: 5%;
 		bottom: 35%;
@@ -612,7 +612,7 @@
 		animation: roTitleSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-ro .preview-description {
+	.template-image-left .preview-description {
 		top: 12%;
 		left: auto;
 		right: 5%;
@@ -623,7 +623,7 @@
 		animation: roDescSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-ro .preview-tags {
+	.template-image-left .preview-tags {
 		top: auto;
 		bottom: 20%;
 		left: auto;
@@ -631,7 +631,7 @@
 		animation: roTagsSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-ro .preview-image-wrapper {
+	.template-image-left .preview-image-wrapper {
 		top: 20%;
 		left: 15%;
 		right: auto;
@@ -646,7 +646,7 @@
 
 	/* Override fullscreen state for RO template (image on left)
 	   Keep using height (not bottom) to ensure smooth transitions */
-	.template-ro .preview-image-wrapper.navigating {
+	.template-image-left .preview-image-wrapper.navigating {
 		top: 0;
 		bottom: auto; /* Keep auto - don't switch layout mode */
 		left: 0;
@@ -707,14 +707,14 @@
 	   - Tags: Bottom area, slides DOWN (from top)
 	   - Image: Right side, curtain reveal LEFT→RIGHT
 	   -------------------------------------------------------------------------- */
-	.template-atoms .preview-title {
+	.template-cascade-left .preview-title {
 		left: 18%;
 		right: 55%;
 		bottom: 28%;
 		animation: atomsTitleSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-atoms .preview-description {
+	.template-cascade-left .preview-description {
 		top: 15%;
 		right: 28%;
 		left: auto;
@@ -724,7 +724,7 @@
 		animation: atomsDescSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-atoms .preview-tags {
+	.template-cascade-left .preview-tags {
 		top: auto;
 		bottom: 18%;
 		left: auto;
@@ -732,7 +732,7 @@
 		animation: atomsTagsSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-atoms .preview-image-wrapper {
+	.template-cascade-left .preview-image-wrapper {
 		top: 22%;
 		right: 3%;
 		bottom: auto;
@@ -791,8 +791,8 @@
 
 	/* Override navigating state for suno/atoms templates
 	   Keep using height (not bottom) to ensure smooth transitions from auto → numeric */
-	.template-suno .preview-image-wrapper.navigating,
-	.template-atoms .preview-image-wrapper.navigating {
+	.template-sweep-left .preview-image-wrapper.navigating,
+	.template-cascade-left .preview-image-wrapper.navigating {
 		top: 0;
 		bottom: auto; /* Keep auto - don't switch layout mode */
 		right: 0;
@@ -810,7 +810,7 @@
 	   - Tags: Top-right, slides DOWN (from top)
 	   - Image: Left side, curtain reveal RIGHT→LEFT
 	   -------------------------------------------------------------------------- */
-	.template-hyper .preview-title {
+	.template-dynamic-left .preview-title {
 		left: auto;
 		right: 15%;
 		bottom: 25%;
@@ -818,7 +818,7 @@
 		animation: hyperTitleSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-hyper .preview-description {
+	.template-dynamic-left .preview-description {
 		top: 15%;
 		left: 45%;
 		right: auto;
@@ -828,7 +828,7 @@
 		animation: hyperDescSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-hyper .preview-tags {
+	.template-dynamic-left .preview-tags {
 		top: 20%;
 		bottom: auto;
 		left: auto;
@@ -836,7 +836,7 @@
 		animation: hyperTagsSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-hyper .preview-image-wrapper {
+	.template-dynamic-left .preview-image-wrapper {
 		top: 20%;
 		left: 12%;
 		right: auto;
@@ -850,7 +850,7 @@
 	}
 
 	/* Keep using height (not bottom) to ensure smooth transitions */
-	.template-hyper .preview-image-wrapper.navigating {
+	.template-dynamic-left .preview-image-wrapper.navigating {
 		top: 0;
 		bottom: auto; /* Keep auto - don't switch layout mode */
 		left: 0;
@@ -914,7 +914,7 @@
 	   - Tags: Bottom-right, slides UP (from bottom)
 	   - Image: Center-right, curtain reveal TOP→BOTTOM
 	   -------------------------------------------------------------------------- */
-	.template-waiting .preview-title {
+	.template-vertical-rise .preview-title {
 		left: auto;
 		right: 10%;
 		top: 15%;
@@ -923,7 +923,7 @@
 		animation: waitingTitleSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-waiting .preview-description {
+	.template-vertical-rise .preview-description {
 		top: auto;
 		left: 18%;
 		right: auto;
@@ -933,7 +933,7 @@
 		animation: waitingDescSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-waiting .preview-tags {
+	.template-vertical-rise .preview-tags {
 		top: auto;
 		bottom: 15%;
 		left: auto;
@@ -941,7 +941,7 @@
 		animation: waitingTagsSlide 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
-	.template-waiting .preview-image-wrapper {
+	.template-vertical-rise .preview-image-wrapper {
 		top: 20%;
 		right: 8%;
 		left: auto;
@@ -955,7 +955,7 @@
 	}
 
 	/* Keep using height (not bottom) to ensure smooth transitions */
-	.template-waiting .preview-image-wrapper.navigating {
+	.template-vertical-rise .preview-image-wrapper.navigating {
 		top: 0;
 		bottom: auto; /* Keep auto - don't switch layout mode */
 		right: 0;

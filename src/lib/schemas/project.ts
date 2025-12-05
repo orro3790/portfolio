@@ -97,20 +97,16 @@ export type ProjectMeta = z.infer<typeof projectMetaSchema>;
  * - Image: Device/preview mockup
  *
  * Templates:
- * - 'layers': Default. Tags↓, Title→, Desc↑, Image curtain←
- * - 'suno': Desc→ (from left), Title←, Tags↓, Image curtain→
- * - 'ro': Desc←, Title←, Tags↑, Image curtain→ (image on LEFT)
- * - 'atoms': Desc→ (from left), Title←, Tags↓, Image curtain→
- * - 'hyper': Desc→, Title→ (from left), Tags↓, Image curtain← (image on LEFT)
- * - 'waiting': Desc↑, Title↓, Tags↑, Image curtain↓
+ * - 'slide-right': Default. Image slides from right, text from left
+ * - 'sweep-left': Everything sweeps in from the left
+ * - 'image-left': Image on LEFT side, text animates from right
+ * - 'cascade-left': Staggered cascade effect from the left
  */
 export const animationTemplateSchema = z.enum([
-	'layers',
-	'suno',
-	'ro',
-	'atoms',
-	'hyper',
-	'waiting'
+	'slide-right',
+	'sweep-left',
+	'image-left',
+	'cascade-left'
 ]);
 
 export type AnimationTemplate = z.infer<typeof animationTemplateSchema>;
